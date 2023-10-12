@@ -1,11 +1,11 @@
 import React from 'react';
-import LoginPage from './components/LoginPage'; // Assuming login_page.js is in a 'Components' folder
+import SignIn from './components/SignIn'; // Assuming login_page.js is in a 'Components' folder
 
 function App() {
   return (
     <div>
       {/* Other content */}
-      <LoginPage /> {/* Render the LoginPage component here */}
+      <SignIn /> {/* Render the LoginPage component here */}
       {/* Other content */}
     </div>
   );
