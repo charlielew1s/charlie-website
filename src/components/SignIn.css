@@ -1,0 +1,24 @@
+.banner {
+    background-color: #4CAF50; /* Green */
+    color: rgb(232, 14, 14);
+    text-align: center;
+    padding: 14px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    font-weight: bold
+}
+
+.button {
+    position: relative;
+    left: 520px
+}
+
+.background {
+    position: fixed;
+    bottom: 0;
+    height: 94%;
+    width: 100%;
+    background-color: rgb(97, 5, 97);
+}

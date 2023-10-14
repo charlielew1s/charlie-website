@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {auth,provider} from "./config";
-import {signInWithPopup} from "firebase/auth";
+import { auth, provider } from "./config";
+import { signInWithPopup } from "firebase/auth";
 import Home from "./Home";
+import './SignIn.css'; // Importing the CSS file for styles
 
 function SignIn(){
     const [value,setValue] = useState('')
@@ -16,12 +17,15 @@ function SignIn(){
         setValue(localStorage.getItem('email'))
     })
 
-return (
-    <div>
-        {value?<Home/>:
-        <button onClick={handleClick}>Signin With Google</button>
-        }
-    </div>
-);
+    return (
+        <div>
+            <div className="banner">RedditSimilar
+                <button className="button" onClick={handleClick}>Sign in with Google</button>
+            </div>
+            <div className="background">
+            </div>
+        </div>
+    );
 }
+
 export default SignIn;
