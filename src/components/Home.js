@@ -1,4 +1,5 @@
 import React from "react";
+import './Home.css';
 
 function Home(){
     const logout =()=>{
@@ -7,7 +8,6 @@ function Home(){
     }
     return (
         <div>
-            <h1>Home Page</h1>
             <button onClick={logout}>Logout</button>
         </div>
     );

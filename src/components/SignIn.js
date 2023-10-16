@@ -20,9 +20,14 @@ function SignIn(){
     return (
         <div>
             <div className="banner">RedditSimilar
-                <button className="button" onClick={handleClick}>Sign in with Google</button>
             </div>
             <div className="background">
+                <p className="middle">RedditSimilar</p>
+            </div>
+            <div className="button">
+                {value?<Home/>:
+                <button onClick={handleClick}>Sign In with Google</button>
+                }
             </div>
         </div>
     );

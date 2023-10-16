@@ -11,14 +11,24 @@
 }
 
 .button {
-    position: relative;
-    left: 520px
+    position: fixed;
+    right: 5px;
+    top: 10px;
 }
 
 .background {
     position: fixed;
     bottom: 0;
-    height: 94%;
+    height: 94.6%;
     width: 100%;
     background-color: rgb(97, 5, 97);
+}
+
+.middle{
+    position: fixed;
+    color: rgb(232, 14, 14);
+    right: 500px;
+    top: 300px;
+    font-weight: bold;
+    font-size: 60px;
 }
