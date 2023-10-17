@@ -1,0 +1,14 @@
+.background {
+    position: fixed;
+    bottom: 0;
+    height: 94.6%;
+    width: 100%;
+    background-color: white
+    
+}
+
+.button {
+    position: fixed;
+    right: 5px;
+    top: 10px;
+}

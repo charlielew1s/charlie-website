@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { auth, provider } from "./config";
 import { signInWithPopup } from "firebase/auth";
 import Home from "./Home";
-import './SignIn.css'; // Importing the CSS file for styles
+import styles from './SignIn.module.css'; // Importing the CSS file for styles
 
 function SignIn(){
     const [value,setValue] = useState('')
@@ -19,14 +19,16 @@ function SignIn(){
 
     return (
         <div>
-            <div className="banner">RedditSimilar
+            <div className={styles.banner}>RedditSimilar
             </div>
-            <div className="background">
-                <p className="middle">RedditSimilar</p>
+            <div className={styles.background}>
+                <div className={styles.middle}>
+                    RedditSimilar
             </div>
-            <div className="button">
+            </div>
+            <div className={styles.background}>
                 {value?<Home/>:
-                <button onClick={handleClick}>Sign In with Google</button>
+                <button className={styles.button} onClick={handleClick}>Sign In with Google</button>
                 }
             </div>
         </div>
