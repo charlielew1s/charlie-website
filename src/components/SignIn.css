@@ -1,0 +1,34 @@
+.banner {
+    background-color: #4CAF50; /* Green */
+    color: rgb(232, 14, 14);
+    text-align: center;
+    padding: 14px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    font-weight: bold
+}
+
+.button {
+    position: fixed;
+    right: 5px;
+    top: 10px;
+}
+
+.background {
+    position: fixed;
+    bottom: 0;
+    height: 94.6%;
+    width: 100%;
+    background-color: rgb(97, 5, 97);
+}
+
+.middle{
+    position: fixed;
+    color: rgb(232, 14, 14);
+    right: 500px;
+    top: 300px;
+    font-weight: bold;
+    font-size: 60px;
+}
