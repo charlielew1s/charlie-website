@@ -1,15 +1,17 @@
-import React from "react";
-import './Home.css';
+import React from 'react';
+import styles from './Home.module.css';
 
-function Home(){
-    const logout =()=>{
-        localStorage.clear()
-        window.location.reload()
+function Home() {
+    const logout = () => {
+        localStorage.clear();
+        window.location.reload();
     }
+
     return (
         <div>
-            <button onClick={logout}>Logout</button>
+            <button className={styles.button} onClick={logout}>Logout</button>
         </div>
     );
 }
+
 export default Home;
