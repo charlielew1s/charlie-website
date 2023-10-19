@@ -9,7 +9,6 @@ exports.getPosts = functions.https.onRequest(async (req, res) => {
     try {
         const postsSnapshot = await db.collection('post').get();
         const posts = [];
-
         postsSnapshot.forEach(doc => {
             posts.push({
                 id: doc.id,
@@ -23,3 +22,6 @@ exports.getPosts = functions.https.onRequest(async (req, res) => {
         res.status(500).send('Internal server error.');
     }
 });
+
+
+

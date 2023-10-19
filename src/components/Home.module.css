@@ -3,3 +3,10 @@
     right: 5px;
     top: 10px;
 }
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 48px); /* 48px is roughly the height of the banner */;
+}
