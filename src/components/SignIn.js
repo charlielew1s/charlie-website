@@ -66,7 +66,7 @@ function SignIn() {
                             Sign In with Google
                         </button>
                         <div>
-                            {postData}
+                            {JSON.stringify(postData)}
                         </div>
                     </>
                 )}    
