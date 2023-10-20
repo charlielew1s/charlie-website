@@ -5,8 +5,12 @@ import Home from "./Home";
 import styles from './SignIn.module.css';
 
 
+
+
+
 function SignIn() {
     const [userEmail, setUserEmail] = useState(null);
+    const [postData, setPostData] = useState(null);
 
     const signIn = () => {
         signInWithPopup(auth, provider)
@@ -25,7 +29,19 @@ function SignIn() {
         if (storedEmail) {
             setUserEmail(storedEmail);
         }
-    }, []);
+    }, [])
+
+    const renderPost = async () => {
+        try {
+            let response = await fetch("https://us-central1-charlie-website-2550b.cloudfunctions.net/getPosts");
+            let data = await response.text();  
+            return data;
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            return null; 
+        }
+    }
+
 
     return (
         <>
@@ -34,13 +50,23 @@ function SignIn() {
                 {userEmail ? (
                     <Home />
                 ) : (
-                    <button className={styles.button} onClick={signIn}>
-                        Sign In with Google
-                    </button>
-                )}
+                    <>
+                        <button className={styles.button} onClick={signIn}>
+                            Sign In with Google
+                        </button>
+                        {async () => {
+                            const data = await renderPost();
+                            setPostData(data);
+                        }}
+                        <div>
+                            {postData}
+                        </div>
+                    </>
+                )}    
             </div>
         </>
     );
-}
+    
 
+}
 export default SignIn;
