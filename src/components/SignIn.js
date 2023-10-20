@@ -3,10 +3,7 @@ import { auth, provider } from "./config";
 import { signInWithPopup } from "firebase/auth";
 import Home from "./Home";
 import styles from './SignIn.module.css';
-
-
-
-
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function SignIn() {
     const [userEmail, setUserEmail] = useState(null);
@@ -29,17 +26,31 @@ function SignIn() {
         if (storedEmail) {
             setUserEmail(storedEmail);
         }
+        callFirebaseFunction()
     }, [])
 
-    const renderPost = async () => {
-        try {
-            let response = await fetch("https://us-central1-charlie-website-2550b.cloudfunctions.net/getPosts");
-            let data = await response.text();  
-            return data;
-        } catch (error) {
-            console.error("Error fetching posts:", error);
-            return null; 
-        }
+    const callFirebaseFunction = event => {
+
+        const functions = getFunctions();
+        const getPosts = httpsCallable(functions, 'getPosts');
+        getPosts()
+          .then((result) => {
+            console.log("result", result)
+            // Read result of the Cloud Function.
+            /** @type {any} */
+            const data = result.data;
+            console.log(data)
+            setPostData(data)
+            // const sanitizedMessage = data.text;
+          })
+          .catch((error) => {
+            console.log(error)
+            // Getting the Error details.
+            const code = error.code;
+            const message = error.message;
+            const details = error.details;
+            // ...
+          });
     }
 
 
@@ -54,10 +65,6 @@ function SignIn() {
                         <button className={styles.button} onClick={signIn}>
                             Sign In with Google
                         </button>
-                        {async () => {
-                            const data = await renderPost();
-                            setPostData(data);
-                        }}
                         <div>
                             {postData}
                         </div>
