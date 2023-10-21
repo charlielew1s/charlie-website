@@ -14,9 +14,7 @@ function Home() {
     return (
         <div>
             <button className={styles.button} onClick={logout}>Logout</button>
-            <button className={styles.createPostButton} onClick={() => setShowCreatePost(true)}>Create post</button>
-            
-            {showCreatePost && <CreatePost />}
+            <CreatePost />
         </div>
   );
 }
