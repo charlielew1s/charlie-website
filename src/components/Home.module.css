@@ -4,3 +4,8 @@
     top: 10px;
 }
 
+.createPostButton {
+    position: fixed;
+    left: 5px;
+    top: 10px;
+}

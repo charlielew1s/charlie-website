@@ -13,17 +13,19 @@
     align-items: center;
     justify-content: center;
     height: calc(100vh - 48px); /* 48px is roughly the height of the banner */
-    background-color: rgb(97, 5, 97);
 }
 
 .button {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #5f086f;
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
+    position: fixed;
+    right: 5px;
+    top: 7px;
 }
 

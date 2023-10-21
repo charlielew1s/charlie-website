@@ -1,3 +1,4 @@
+import Posts from './Posts';
 import React, { useEffect, useState } from "react";
 import { auth, provider } from "./config";
 import { signInWithPopup } from "firebase/auth";
@@ -65,15 +66,12 @@ function SignIn() {
                         <button className={styles.button} onClick={signIn}>
                             Sign In with Google
                         </button>
-                        <div>
-                            {JSON.stringify(postData)}
-                        </div>
+                        {postData && <Posts data={postData} />}
                     </>
                 )}    
             </div>
         </>
     );
     
-
 }
 export default SignIn;
