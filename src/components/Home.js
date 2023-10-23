@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Home.module.css';
 import CreatePost from './CreatePost';
-
 function Home() {
-   
-    const [showCreatePost, setShowCreatePost] = useState(false);
 
     const logout = () => {
         localStorage.clear();
@@ -14,10 +11,9 @@ function Home() {
     return (
         <div>
             <button className={styles.button} onClick={logout}>Logout</button>
-            <CreatePost />
+            <CreatePost/>
         </div>
   );
 }
-
 export default Home;
 

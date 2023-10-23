@@ -25,3 +25,21 @@ exports.getPosts = functions.https.onRequest((req, res) => {
         }
     })
 });
+
+exports.createPost = functions.https.onCall((data, context) => {
+    // Ensure the user is authenticated.
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            'unauthenticated', 
+            'The function must be called while authenticated.'
+        );
+    }
+
+    const post = {
+        content: data.content,
+        name: data.name,
+        userID: data.userID 
+    };
+
+    return admin.firestore().collection('posts').add(post);
+});

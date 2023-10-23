@@ -4,7 +4,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
-import styles from './CreatePost.module.css'
+import styles from './CreatePost.module.css';
+import { getFunctions, httpsCallable } from 'firebase/functions'; // Import Firebase Functions
+import { getAuth } from 'firebase/auth'; // Import Firebase Authentication
+import { useAuthState } from 'react-firebase-hooks/auth'; // Import the hook
 
 const style = {
   position: 'absolute',
@@ -18,20 +21,41 @@ const style = {
   p: 4,
 };
 
+
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
 
+  const auth = getAuth();
+  const [user] = useAuthState(auth); // Get the currently authenticated user
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSubmit = () => {
-    // Here, you can handle your form submission logic (e.g., send it to a server)
-    console.log('Title:', title);
-    console.log('Content:', content);
+    // Ensure there's a logged-in user
+    if (!user) {
+      console.error("User is not authenticated");
+      return;
+    }
 
-    // After submitting, close the modal
+    const post = {
+      name: title,
+      content: content,
+      userID: user.uid // Get the user's UID
+    };
+
+    const functions = getFunctions();
+    const createPost = httpsCallable(functions, 'createPost');
+    createPost(post)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
     handleClose();
   };
 
