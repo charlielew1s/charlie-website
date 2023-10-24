@@ -43,3 +43,31 @@ exports.createPost = functions.https.onCall((data, context) => {
 
     return admin.firestore().collection('posts').add(post);
 });
+
+exports.deletePostByAttributes = functions.https.onCall(async (data, context) => {
+    const { name, content, userID } = data;
+  
+    const db = admin.firestore();
+    const postsRef = db.collection('posts');
+  
+    try {
+      const snapshot = await postsRef.where('name', '==', name)
+                                     .where('content', '==', content)
+                                     .where('userID', '==', userID)
+                                     .get();
+  
+      if (snapshot.empty) {
+        return { success: false, message: 'No matching post found' };
+      }
+  
+      const batch = db.batch();
+      snapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+  
+      return { success: true, message: 'Post deleted successfully' };
+    } catch (error) {
+      throw new functions.https.HttpsError('internal', 'Failed to delete post', error);
+    }
+  });

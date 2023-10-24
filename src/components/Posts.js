@@ -13,7 +13,7 @@ const Posts = ({ data }) => {
         <div>
             {data.map((post, index) => (
                 <div key={index} style={postStyle}>
-                    <div><strong>User ID:</strong> {post.userId}</div>
+                    <div><strong>User ID:</strong> {post.userID}</div>
                     <div><strong>Name:</strong> {post.name}</div>
                     <div><strong>Content:</strong> {post.content}</div>
                 </div>
