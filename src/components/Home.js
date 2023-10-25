@@ -4,6 +4,7 @@ import styles from './Home.module.css';
 import CreatePost from './CreatePost';
 import { getFunctions, httpsCallable } from "firebase/functions";
 import DeletePost from './DeletePost';
+import EditPost from './EditPost';
 function Home() {
 
     const [postData, setPostData] = useState(null);
@@ -47,6 +48,7 @@ function Home() {
             <button className={styles.button} onClick={logout}>Logout</button>
             <CreatePost/>
             <DeletePost/>
+            <EditPost/>
             {postData && <Posts data={postData} />}
         </div>
   );

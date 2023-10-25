@@ -71,3 +71,63 @@ exports.deletePostByAttributes = functions.https.onCall(async (data, context) =>
       throw new functions.https.HttpsError('internal', 'Failed to delete post', error);
     }
   });
+
+  exports.editPostByAttributes = functions.https.onCall(async (data, context) => {
+  const { oldName, oldContent, newName, newContent, userID } = data;
+
+  const db = admin.firestore();
+  const postsRef = db.collection('posts');
+
+  try {
+    const snapshot = await postsRef.where('name', '==', oldName)
+                                   .where('content', '==', oldContent)
+                                   .where('userID', '==', userID)
+                                   .limit(1) // Assuming unique posts, only take the first match.
+                                   .get();
+
+    if (snapshot.empty) {
+      return { success: false, message: 'No matching post found' };
+    }
+
+    const postDoc = snapshot.docs[0];
+    await postDoc.ref.update({
+      name: newName,
+      content: newContent
+    });
+
+    return { success: true, message: 'Post updated successfully' };
+  } catch (error) {
+    throw new functions.https.HttpsError('internal', 'Failed to edit post', error);
+  }
+});
+
+exports.editPostByAttributes = functions.https.onCall(async (data, context) => {
+    const { oldName, oldContent, newName, newContent, userID } = data;
+  
+    const db = admin.firestore();
+    const postsRef = db.collection('posts');
+  
+    try {
+      const snapshot = await postsRef.where('name', '==', oldName)
+                                     .where('content', '==', oldContent)
+                                     .where('userID', '==', userID)
+                                     .limit(1) // Assuming unique posts, only take the first match.
+                                     .get();
+  
+      if (snapshot.empty) {
+        return { success: false, message: 'No matching post found' };
+      }
+  
+      const postDoc = snapshot.docs[0];
+      await postDoc.ref.update({
+        name: newName,
+        content: newContent
+      });
+  
+      return { success: true, message: 'Post updated successfully' };
+    } catch (error) {
+      throw new functions.https.HttpsError('internal', 'Failed to edit post', error);
+    }
+  });
+
+  
