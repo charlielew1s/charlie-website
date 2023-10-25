@@ -1,5 +1,5 @@
 .banner {
-    background-color: #4CAF50; /* Green */
+    background-color: #13ac18; /* Green */
     color: white;
     text-align: center;
     padding: 14px 20px;
@@ -17,14 +17,14 @@
 
 .button {
     padding: 10px 20px;
-    background-color: #5f086f;
+    background-color: #3da714;
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
-    position: fixed;
+    position: absolute;
     right: 5px;
     top: 7px;
 }

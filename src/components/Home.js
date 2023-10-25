@@ -44,13 +44,13 @@ function Home() {
 
 
     return (
-        <div>
+        <>
             <button className={styles.button} onClick={logout}>Logout</button>
-            <CreatePost/>
-            <DeletePost/>
-            <EditPost/>
+              <CreatePost/>
+              <DeletePost/>
+              <EditPost/>
             {postData && <Posts data={postData} />}
-        </div>
+        </>
   );
 }
 export default Home;

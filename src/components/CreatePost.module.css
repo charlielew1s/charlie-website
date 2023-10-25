@@ -1,5 +1,5 @@
 .modal_button{
-    position: fixed;
+    position: absolute;
     left: 5px;
     top: 3px;
 }
