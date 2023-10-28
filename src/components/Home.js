@@ -5,6 +5,8 @@ import CreatePost from './CreatePost';
 import { getFunctions, httpsCallable } from "firebase/functions";
 import DeletePost from './DeletePost';
 import EditPost from './EditPost';
+import SetUsername from './SetUsername';
+
 function Home() {
 
     const [postData, setPostData] = useState(null);
@@ -49,6 +51,7 @@ function Home() {
               <CreatePost/>
               <DeletePost/>
               <EditPost/>
+              <SetUsername/>
             {postData && <Posts data={postData} />}
         </>
   );

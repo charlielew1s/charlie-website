@@ -130,4 +130,32 @@ exports.editPostByAttributes = functions.https.onCall(async (data, context) => {
     }
   });
 
+  exports.setUsername = functions.https.onCall(async (data, context) => {
+    const { desiredUsername } = data;
+    const userID = context.auth.uid;
   
+    const db = admin.firestore();
+    const usernamesRef = db.collection('usernames');
+  
+    // Check if desired username is already taken
+    const snapshot = await usernamesRef.where('username', '==', desiredUsername).get();
+    if (!snapshot.empty && snapshot.docs[0].id !== userID) {
+        throw new functions.https.HttpsError('already-exists', 'This username is already taken.');
+    }
+    
+    // Check if this user already has a username
+    const userDoc = await usernamesRef.doc(userID).get();
+    if (userDoc.exists) {
+        // If yes, delete the old username
+        const oldUsername = userDoc.data().username;
+        if (oldUsername !== desiredUsername) {
+            // Only update if the old username is different from the desired one
+            await usernamesRef.doc(userID).update({ username: desiredUsername });
+        }
+    } else {
+        // If not, simply add the new username
+        await usernamesRef.doc(userID).set({ username: desiredUsername });
+    }
+
+    return { success: true, message: 'Username set successfully' };
+});

@@ -10,6 +10,8 @@
     top: 10px;
 }
 
+
+
 .banner {
     background-color: #13ac18; /* Green */
     color: white;
@@ -26,3 +28,4 @@
     justify-content: center;
     height: calc(100vh - 48px); /* 48px is roughly the height of the banner */
 }
+
