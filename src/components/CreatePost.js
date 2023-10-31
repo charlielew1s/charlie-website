@@ -62,7 +62,7 @@ export default function BasicModal() {
   return (
     <div>
         <div className={styles.modal_button}>
-            <Button onClick={handleOpen}>Create Post</Button>
+            <button onClick={handleOpen}>Create Post</button>
         </div>
       <Modal
         open={open}

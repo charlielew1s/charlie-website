@@ -1,19 +1,5 @@
-.button {
-    position: absolute;
-    right: 5px;
-    top: 10px;
-}
-
-.createPostButton {
-    position: absolute;
-    left: 5px;
-    top: 10px;
-}
-
-
-
-.banner {
-    background-color: #13ac18; /* Green */
+.homeBanner {
+    background-color: #ea2121; /* Example: Different color, blue */
     color: white;
     text-align: center;
     padding: 14px 20px;
@@ -22,10 +8,24 @@
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.container {
+.homeContainer {
+    /* New styles for the Home page container */
     display: flex;
     align-items: center;
     justify-content: center;
-    height: calc(100vh - 48px); /* 48px is roughly the height of the banner */
+    height: calc(100vh - 48px); /* 48px is roughly the height of the homeBanner */
+}
+
+.logoutButton {
+    position: absolute;
+    right: 5px;
+    top: 10px;
+}
+
+
+.createPostButton {
+    position: absolute;
+    left: 5px;
+    top: 10px;
 }
 

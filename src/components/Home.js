@@ -1,60 +1,48 @@
-import Posts from './Posts';
 import React, { useEffect, useState } from 'react';
 import styles from './Home.module.css';
-import CreatePost from './CreatePost';
+import Posts from './Posts';
+import CreatePost from './CreatePost'; // Import the CreatePost component
 import { getFunctions, httpsCallable } from "firebase/functions";
-import DeletePost from './DeletePost';
-import EditPost from './EditPost';
-import SetUsername from './SetUsername';
 
-function Home() {
-
-    const [postData, setPostData] = useState(null);
+function Home({ userEmail }) {
+    const [postData, setPostData] = useState([]);
 
     useEffect(() => {
         callFirebaseFunction();
     }, []);
 
-    const logout = () => {
-        localStorage.clear();
-        window.location.reload();
-    }
-
-    const callFirebaseFunction = event => {
-
+    const callFirebaseFunction = () => {
         const functions = getFunctions();
         const getPosts = httpsCallable(functions, 'getPosts');
         getPosts()
-          .then((result) => {
-            console.log("result", result)
-            // Read result of the Cloud Function.
-            /** @type {any} */
-            const data = result.data;
-            console.log(data)
-            setPostData(data)
-            // const sanitizedMessage = data.text;
-          })
-          .catch((error) => {
-            console.log(error)
-            // Getting the Error details.
-            const code = error.code;
-            const message = error.message;
-            const details = error.details;
-            // ...
-          });
+            .then((result) => {
+                setPostData(result.data || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching posts:", error);
+            });
     }
 
+    const logout = () => {
+        localStorage.clear();
+        window.location.reload(); // Or use a better method to inform App.js about the logout
+    }
 
     return (
         <>
-            <button className={styles.button} onClick={logout}>Logout</button>
-              <CreatePost/>
-              <DeletePost/>
-              <EditPost/>
-              <SetUsername/>
-            {postData && <Posts data={postData} />}
-        </>
-  );
-}
-export default Home;
+            <div className={styles.homeBanner}>RedditSimilar</div>
+            <button className={styles.logoutButton} onClick={logout}>Logout</button>
 
+            {/* Render the CreatePost component */}
+            <CreatePost />
+
+            {postData.length > 0 ? (
+                <Posts data={postData} />
+            ) : (
+                <p>No posts available.</p>
+            )}
+        </>
+    );
+}
+
+export default Home;

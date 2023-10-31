@@ -1,5 +1,5 @@
-.banner {
-    background-color: #13ac18; /* Green */
+.signInBanner {
+    background-color: #d43c1a; /* Green */
     color: white;
     text-align: center;
     padding: 14px 20px;
@@ -8,16 +8,16 @@
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.container {
+.signInContainer {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: calc(100vh - 48px); /* 48px is roughly the height of the banner */
+    height: calc(100vh - 48px); /* 48px is roughly the height of the signInBanner */
 }
 
-.button {
+.signInButton {
     padding: 10px 20px;
-    background-color: #3da714;
+    background-color: #a412cd;
     border: none;
     border-radius: 5px;
     color: white;
@@ -25,7 +25,6 @@
     cursor: pointer;
     transition: background-color 0.3s;
     position: absolute;
-    right: 5px;
     top: 7px;
+    right: 4px
 }
-

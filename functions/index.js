@@ -45,28 +45,35 @@ exports.createPost = functions.https.onCall((data, context) => {
 });
 
 exports.editPost = functions.https.onCall((data, context) => {
-  // Check if the user is authenticated
-  if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
-  }
-
-  // Get data from the request
-  const postId = data.postId;
-  const newContent = data.newContent;
-  const newName = data.newName;
-
-  // Reference to the Firestore document
-  const postRef = admin.firestore().collection('posts').doc(postId);
-
-  // Update the document
-  return postRef.update({
-      content: newContent,
-      name: newName
-  })
-  .then(() => {
-      return { result: `Post with ID: ${postId} has been updated.` };
-  })
-  .catch((error) => {
-      throw new functions.https.HttpsError('unknown', 'An error occurred while updating the post.', error);
+    // Check for authentication
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+  
+    const { postId, name, content } = data;
+    return admin.firestore().collection('posts').doc(postId).update({ name, content })
+      .then(() => {
+        return { status: 'success', message: 'Post updated successfully' };
+      })
+      .catch(error => {
+        throw new functions.https.HttpsError('unknown', error.message, error);
+      });
   });
-});
+
+  exports.deletePost = functions.https.onCall((data, context) => {
+    // Check for authentication
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+  
+    const { postId } = data;
+    return admin.firestore().collection('posts').doc(postId).delete()
+      .then(() => {
+        return { status: 'success', message: 'Post deleted successfully' };
+      })
+      .catch(error => {
+        throw new functions.https.HttpsError('unknown', error.message, error);
+      });
+  });
+
+
