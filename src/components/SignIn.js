@@ -50,21 +50,23 @@ function SignIn({ onSignIn }) { // Ensure onSignIn is included here
     return (
         <>
             <div className={styles.signInBanner}>RedditSimilar</div>
-            <div className={styles.signInContainer}>
-                {userEmail ? (
-                    <Home userEmail={userEmail} />
-                ) : (
-                    <button className={styles.signInButton} onClick={signIn}>
-                        Sign In with Google
-                    </button>
-                )}
-                {postData.length > 0 ? (
-                    <Posts data={postData} />
-                ) : (
-                    <p>No posts available.</p>
-                )}
+            <div className={styles.mainLayout}>
+                <div className={styles.signInContainer}>
+                    {userEmail ? (
+                        <Home userEmail={userEmail} />
+                    ) : (
+                        <button className={styles.signInButton} onClick={signIn}>
+                            Sign In with Google
+                        </button>
+                    )}
+                    {postData.length > 0 ? (
+                        <Posts data={postData} />
+                    ) : (
+                        <p>No posts available.</p>
+                    )}
+                </div>
             </div>
-        </>    
+        </>
     );
 }
 

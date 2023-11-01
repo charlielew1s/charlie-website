@@ -32,15 +32,18 @@ function Home({ userEmail }) {
         <>
             <div className={styles.homeBanner}>RedditSimilar</div>
             <button className={styles.logoutButton} onClick={logout}>Logout</button>
+            <button className={styles.createPostButton}>Create Post</button> {/* Assuming you have this button */}
 
-            {/* Render the CreatePost component */}
-            <CreatePost />
+            <div className={styles.homeContainer}>
+                {/* Render the CreatePost component */}
+                <CreatePost />
 
-            {postData.length > 0 ? (
-                <Posts data={postData} />
-            ) : (
-                <p>No posts available.</p>
-            )}
+                {postData.length > 0 ? (
+                    <Posts data={postData} />
+                ) : (
+                    <p>No posts available.</p>
+                )}
+            </div>
         </>
     );
 }
