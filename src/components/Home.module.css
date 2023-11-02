@@ -1,5 +1,40 @@
-.button {
-    position: fixed;
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: grey; /* Sets the background color for the entire page */
+}
+
+
+.homeBanner {
+    background-color: #ea2121; /* Example: Different color, blue */
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    font-weight: bold;
+    width: 100%;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+.homeContainer {
+    max-width: 660px; /* Adjust width as needed */
+    margin: auto; /* Centers the container */
+    padding: 10px;
+    background-color: white; /* Sets the background of the container */
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+    border-radius: 4px; /* Optional for rounded corners */
+}
+
+.logoutButton {
+    position: absolute;
     right: 5px;
     top: 10px;
 }
+
+
+.createPostButton {
+    position: absolute;
+    left: 5px;
+    top: 10px;
+}
+

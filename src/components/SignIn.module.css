@@ -1,5 +1,21 @@
-.banner {
-    background-color: #4CAF50; /* Green */
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: grey; /* Set the background color for the entire page */
+}
+
+.mainLayout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 48px); /* Adjusting height to account for banner */
+    padding: 10px;
+    width: 100vw; /* Ensures it takes the full viewport width */
+    box-sizing: border-box; /* Ensures padding doesn't add to the width */
+}
+
+.signInBanner {
+    background-color: #d43c1a; /* Green */
     color: white;
     text-align: center;
     padding: 14px 20px;
@@ -8,25 +24,18 @@
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.container {
+.signInContainer {
+    max-width: 660px; /* Same as post max-width */
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: calc(100vh - 48px); /* 48px is roughly the height of the banner */
-    background-color: rgb(97, 5, 97);
+    height: calc(100vh - 48px); /* 48px is roughly the height of the signInBanner */
+    background-color: white;
 }
 
-.button {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.button:hover {
-    background-color: #45a049;
+.signInButton {
+    position: absolute;
+    top: 7px;
+    right: 4px
 }
