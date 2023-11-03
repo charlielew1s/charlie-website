@@ -12,9 +12,13 @@ function App() {
     }
   }, []);
 
+  const handleSignOut = () => {
+    setUserEmail(null);
+  };
+
   return (
     <div>
-      {userEmail ? <Home userEmail={userEmail} /> : <SignIn onSignIn={setUserEmail} />}
+       {userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />}
     </div>
   );
 }

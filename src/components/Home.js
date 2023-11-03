@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Home.module.css';
 import Posts from './Posts';
-import CreatePost from './CreatePost'; // Import the CreatePost component
+import CreatePost from './CreatePost'; 
+import { signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { auth } from './config'
 
-function Home({ userEmail }) {
+function Home({ userEmail, onSignOut }) {
     const [postData, setPostData] = useState([]);
 
     useEffect(() => {
@@ -24,9 +26,15 @@ function Home({ userEmail }) {
     }
 
     const logout = () => {
-        localStorage.clear();
-        window.location.reload(); // Or use a better method to inform App.js about the logout
-    }
+        signOut(auth).then(() => {
+          localStorage.clear();
+          if (onSignOut) {
+            onSignOut();
+          }
+        }).catch((error) => {
+          console.error("Error during sign-out:", error);
+        });
+      }
 
     return (
         <>
