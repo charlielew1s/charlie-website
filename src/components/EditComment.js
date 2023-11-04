@@ -3,12 +3,19 @@ import React, { useState } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const EditComment = ({ postId, comment }) => {
+    // Ensure that comment is not undefined
+    if (!comment) {
+        console.error('EditComment component was rendered without a comment prop.');
+        return null; // Don't render the component if comment is undefined
+    }
+
     const [newContent, setNewContent] = useState(comment.content);
     const [editing, setEditing] = useState(false);
 
     const editComment = httpsCallable(getFunctions(), 'editComment');
 
     const handleEdit = () => {
+        // Further checks can be added here if needed
         editComment({ postId: postId, commentId: comment.id, newContent: newContent })
             .then(() => {
                 // Handle the response
@@ -41,4 +48,5 @@ const EditComment = ({ postId, comment }) => {
 };
 
 export default EditComment;
+
 

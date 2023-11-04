@@ -53,7 +53,7 @@ const CreateComment = ({ postId }) => {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Create Comment</Button>
+      <button onClick={handleOpen}>Create Comment</button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
