@@ -5,9 +5,9 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import styles from './CreatePost.module.css';
-import { getFunctions, httpsCallable } from 'firebase/functions'; // Import Firebase Functions
 import { getAuth } from 'firebase/auth'; // Import Firebase Authentication
 import { useAuthState } from 'react-firebase-hooks/auth'; // Import the hook
+import { getFunctions, httpsCallable } from 'firebase/functions'; // Import Firebase Functions
 
 const style = {
   position: 'absolute',
@@ -20,7 +20,6 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-
 
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);

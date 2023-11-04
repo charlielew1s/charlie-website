@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from './config';
+import { auth, firestore } from './config';
 import EditPost from './EditPost';
 import DeletePost from './DeletePost';
-import CommentForm from './CommentForm'; // Import the CommentForm component
-import EditComment from './EditComment'; // Import the EditComment component
-import DeleteComment from './DeleteComment'; // Import the DeleteComment component
-
-
+import CreateComment from './CreateComment';
+import { collection, query, where, getDocs } from "firebase/firestore";
+// Import EditComment and DeleteComment components
 
 const postStyle = {
     border: '1px solid #ccc',
@@ -25,14 +23,55 @@ const buttonContainerStyle = {
     marginBottom: '10px', // Space below the button container
 };
 
+// Comment component placeholder
+const Comment = ({ comment }) => (
+    <div>
+        <p>{comment.content}</p>
+        {/* Render Edit and Delete buttons if the user owns this comment */}
+        {/* <EditComment comment={comment} />
+        <DeleteComment commentId={comment.id} /> */}
+    </div>
+);
 
 const Posts = ({ data }) => {
     const [user] = useAuthState(auth);
+    const [comments, setComments] = useState({}); // This will hold comments for all posts
+
+    // Fetch comments for a post
+    const fetchComments = async (postId) => {
+        const q = query(collection(firestore, 'comments'), where('postId', '==', postId));
+        const commentsSnapshot = await getDocs(q);
+        const commentsForPost = [];
+        console.log('comments: ', commentsSnapshot)
+        commentsSnapshot.forEach(doc => {
+            commentsForPost.push({ id: doc.id, ...doc.data() });
+        });
+        setComments(prevComments => ({ ...prevComments, [postId]: commentsForPost }));
+    };
+
+    // Use useEffect to fetch comments when the component mounts or data changes
+    useEffect(() => {
+        data.forEach(post => {
+            fetchComments(post.id);
+        });
+    }, [data]);
+
+    // Function to render comments
+    const renderComments = (postId) => {
+        const commentsForPost = comments[postId] || [];
+        return (
+            <div>
+                {commentsForPost.map(comment => (
+                    <Comment key={comment.id} comment={comment} />
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div>
-            {data.map((post, index) => (
-                <div key={index} style={postStyle}>
+            {data.map((post) => (
+                <div key={post.id} style={postStyle}>
                     {user && post.userID === user.uid && (
                         <div style={buttonContainerStyle}>
                             <EditPost post={post} />
@@ -42,18 +81,11 @@ const Posts = ({ data }) => {
                     <div><strong>{post.name}</strong></div>
                     <br />
                     <div>{post.content}</div>
-                    <CommentForm postId={post.id} />
-                    {post.comments && post.comments.map((comment) => (
-                        <div key={comment.id}>
-                            <p>{comment.content}</p>
-                            {user && comment.userID === user.uid && (
-                                <div>
-                                    <EditComment postId={post.id} comment={comment} />
-                                    <DeleteComment postId={post.id} commentId={comment.id} />
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                    {/* Render comments for this post */}
+                    {renderComments(post.id)}
+                    {/* Conditionally render the CreateComment button */}
+                    {user && <CreateComment postId={post.id} />}
+                    {/* You will need to add EditComment and DeleteComment components as needed */}
                 </div>
             ))}
         </div>
@@ -61,3 +93,4 @@ const Posts = ({ data }) => {
 }
 
 export default Posts;
+
