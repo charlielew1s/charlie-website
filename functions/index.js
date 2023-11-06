@@ -121,37 +121,59 @@ exports.createComment = functions.https.onCall((data, context) => {
 });
 
 // Function to edit a comment
-exports.editComment = functions.https.onCall((data, context) => {
-    // Check for authentication
-    if (!context.auth || context.auth.uid !== data.userID) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated and owner of the comment.');
-    }
+exports.editComment = functions.https.onCall(async (data, context) => {
+  // Check for authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
 
-    const { commentId, content } = data;
-    return db.collection('comments').doc(commentId).update({ content })
-      .then(() => {
-        return { status: 'success', message: 'Comment updated successfully' };
-      })
-      .catch(error => {
-        throw new functions.https.HttpsError('unknown', error.message, error);
-      });
+  const { commentId, newContent } = data;
+  const commentDoc = await db.collection('comments').doc(commentId).get();
+
+  if (!commentDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'Comment not found.');
+  }
+
+  if (commentDoc.data().userID !== context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the comment.');
+  }
+
+  return db.collection('comments').doc(commentId).update({ content: newContent })
+    .then(() => {
+      return { status: 'success', message: 'Comment edited successfully' };
+    })
+    .catch(error => {
+      throw new functions.https.HttpsError('unknown', error.message, error);
+    });
 });
+
 
 // Function to delete a comment
-exports.deleteComment = functions.https.onCall((data, context) => {
-    // Check for authentication
-    if (!context.auth || context.auth.uid !== data.userID) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated and owner of the comment.');
-    }
+exports.deleteComment = functions.https.onCall(async (data, context) => {
+  // Check for authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
 
-    const { commentId } = data;
-    return db.collection('comments').doc(commentId).delete()
-      .then(() => {
-        return { status: 'success', message: 'Comment deleted successfully' };
-      })
-      .catch(error => {
-        throw new functions.https.HttpsError('unknown', error.message, error);
-      });
+  const { commentId } = data;
+  const commentDoc = await db.collection('comments').doc(commentId).get();
+
+  if (!commentDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'Comment not found.');
+  }
+
+  if (commentDoc.data().userID !== context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the comment.');
+  }
+
+  return db.collection('comments').doc(commentId).delete()
+    .then(() => {
+      return { status: 'success', message: 'Comment deleted successfully' };
+    })
+    .catch(error => {
+      throw new functions.https.HttpsError('unknown', error.message, error);
+    });
 });
+
     
   
