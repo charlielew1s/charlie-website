@@ -48,7 +48,7 @@ const EditComment = ({ comment }) => {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Edit</Button>
+      <button onClick={handleOpen}>Edit Comment</button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">

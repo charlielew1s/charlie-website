@@ -1,0 +1,22 @@
+/* Posts.module.css */
+.postContainer {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 5px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.commentContainer {
+  margin-top: 10px;
+}
+  

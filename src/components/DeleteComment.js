@@ -37,9 +37,9 @@ const DeleteComment = ({ commentId }) => {
 
     return (
         <div>
-            <Button variant="outlined" color="error" onClick={handleClickOpen}>
-                Delete
-            </Button>
+            <button variant="outlined" color="error" onClick={handleClickOpen}>
+                Delete Comment
+            </button>
             <Dialog
                 open={open}
                 onClose={handleClose}

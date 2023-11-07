@@ -7,36 +7,22 @@ import CreateComment from './CreateComment';
 import EditComment from './EditComment';
 import DeleteComment from './DeleteComment';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import styles from './Posts.module.css'; // Import the CSS module here
 
-const postStyle = {
-  border: '1px solid #ccc',
-  padding: '10px',
-  margin: '10px auto',
-  borderRadius: '5px',
-  maxWidth: '600px',
-  width: '100%'
-};
-
-const buttonContainerStyle = {
-  display: 'flex',
-  justifyContent: 'start',
-  gap: '10px',
-  marginBottom: '10px'
-};
 
 // Comment component placeholder
 const Comment = ({ comment, postId, currentUser }) => (
-    <div>
-      <p>{comment.content}</p>
-      {/* Only show edit and delete buttons if the current user created this comment */}
-      {currentUser && currentUser.uid === comment.userID && (
-        <>
-          <EditComment postId={postId} comment={comment} />
-          <DeleteComment commentId={comment.id} />
-        </>
-      )}
-    </div>
-  );
+  <div className={styles.commentContainer}>
+    <p>{comment.content}</p>
+    {/* Only show edit and delete buttons if the current user created this comment */}
+    {currentUser && currentUser.uid === comment.userID && (
+      <div className={styles.buttonContainer}>
+        <EditComment comment={comment} />
+        <DeleteComment commentId={comment.id} />
+      </div>
+    )}
+  </div>
+);
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
@@ -77,9 +63,9 @@ const Posts = ({ data }) => {
   return (
     <div>
       {data.map((post) => (
-        <div key={post.id} style={postStyle}>
+        <div key={post.id} className={styles.postContainer}>
           {user && post.userID === user.uid && (
-            <div style={buttonContainerStyle}>
+            <div className={styles.buttonContainer}>
               <EditPost post={post} />
               <DeletePost postId={post.id} />
             </div>
@@ -97,5 +83,4 @@ const Posts = ({ data }) => {
 }
 
 export default Posts;
-
 
