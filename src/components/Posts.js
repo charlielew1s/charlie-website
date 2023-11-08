@@ -11,7 +11,7 @@ import styles from './Posts.module.css'; // Import the CSS module here
 
 
 // Comment component placeholder
-const Comment = ({ comment, postId, currentUser }) => (
+const Comment = ({ comment, currentUser }) => (
   <div className={styles.commentContainer}>
     <p>{comment.content}</p>
     {/* Only show edit and delete buttons if the current user created this comment */}

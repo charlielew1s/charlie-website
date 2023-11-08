@@ -1,5 +1,5 @@
 .postContainer {
-  border: 1px solid #ccc;
+  border: 10px solid #c33dd0;
   padding: 10px;
   margin: 10px auto;
   border-radius: 5px;
@@ -16,5 +16,8 @@
 }
 
 .commentContainer {
+  border: 10px solid #FFA500; /* This creates a light grey outline */
+  padding: 10px;
   margin-top: 10px;
+  border-radius: 5px; /* Optional: if you want rounded corners */
 }
