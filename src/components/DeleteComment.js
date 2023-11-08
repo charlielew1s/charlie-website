@@ -64,4 +64,3 @@ const DeleteComment = ({ commentId }) => {
 }
 
 export default DeleteComment;
-

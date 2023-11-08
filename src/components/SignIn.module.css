@@ -25,13 +25,12 @@ body, html {
 }
 
 .signInContainer {
-    max-width: 660px; /* Same as post max-width */
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: calc(100vh - 48px); /* 48px is roughly the height of the signInBanner */
-    background-color: white;
+    max-width: 660px; /* Adjust width as needed */
+    margin: auto; /* Centers the container */
+    padding: 10px;
+    background-color: white; /* Sets the background of the container */
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+    border-radius: 4px; /* Optional for rounded corners */
 }
 
 .signInButton {

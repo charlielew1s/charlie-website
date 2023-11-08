@@ -83,4 +83,3 @@ const Posts = ({ data }) => {
 }
 
 export default Posts;
-

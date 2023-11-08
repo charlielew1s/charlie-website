@@ -80,6 +80,3 @@ const EditComment = ({ comment }) => {
 }
 
 export default EditComment;
-
-
-
