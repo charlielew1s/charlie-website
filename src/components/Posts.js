@@ -10,9 +10,11 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import styles from './Posts.module.css'; // Import the CSS module here
 
 
+
+
 // Comment component placeholder
-const Comment = ({ comment, currentUser }) => (
-  <div className={styles.commentContainer}>
+const Comment = ({ comment, currentUser, isLastComment }) => (
+  <div className={isLastComment ? styles.lastCommentContainer : styles.commentContainer}>
     <p>{comment.content}</p>
     {/* Only show edit and delete buttons if the current user created this comment */}
     {currentUser && currentUser.uid === comment.userID && (
@@ -23,6 +25,7 @@ const Comment = ({ comment, currentUser }) => (
     )}
   </div>
 );
+
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
@@ -45,41 +48,52 @@ const Posts = ({ data }) => {
   }, [data]);
 
   const renderComments = (postId) => {
-    const commentsForPost = comments[postId] || [];
-    return (
-      <div>
-        {commentsForPost.map(comment => (
-          <Comment
-            key={comment.id}
-            comment={comment}
-            postId={postId}
-            currentUser={user}
-          />
-        ))}
-      </div>
-    );
-  };
-
+  const commentsForPost = comments[postId] || [];
   return (
-    <div>
-      {data.map((post) => (
-        <div key={post.id} className={styles.postContainer}>
-          {user && post.userID === user.uid && (
+    <div className={styles.commentsSection}>
+      {commentsForPost.map(comment => (
+        <Comment
+          key={comment.id}
+          comment={comment}
+          postId={postId}
+          currentUser={user}
+        />
+      ))}
+    </div>
+  );
+};
+
+return (
+  <div>
+    {data.map((post, index) => (
+      <React.Fragment key={post.id}>
+        <div className={styles.postContainer}>
+          {/* Conditionally render the Edit and Delete buttons for the post */}
+          {user && user.uid === post.userID && (
             <div className={styles.buttonContainer}>
               <EditPost post={post} />
               <DeletePost postId={post.id} />
             </div>
           )}
           <div><strong>{post.name}</strong></div>
-          <br />
           <div>{post.content}</div>
-          <p>Comments:</p>
-          {renderComments(post.id)}
           {user && <CreateComment postId={post.id} />}
+          <p className={styles.commentsLabel}>Comments:</p>
         </div>
-      ))}
-    </div>
-  );
-}
+        {comments[post.id] && comments[post.id].map((comment, commentIndex, commentArray) => (
+          <Comment
+            key={comment.id}
+            comment={comment}
+            currentUser={user}
+            isLastComment={commentIndex === commentArray.length - 1}
+          />
+        ))}
+        {/* This div is used to add space after the last comment of each post */}
+        {data.length - 1 !== index && <div className={styles.spaceAfterComments}></div>}
+      </React.Fragment>
+    ))}
+  </div>
+);
+};
 
 export default Posts;

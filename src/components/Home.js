@@ -25,6 +25,7 @@ function Home({ userEmail, onSignOut }) {
             });
     }
 
+    
     const logout = () => {
         signOut(auth).then(() => {
           localStorage.clear();
