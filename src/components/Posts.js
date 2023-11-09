@@ -76,7 +76,9 @@ return (
             </div>
           )}
           <div><strong>{post.name}</strong></div>
+          <br></br>
           <div>{post.content}</div>
+          <br></br>
           {user && <CreateComment postId={post.id} />}
           <p className={styles.commentsLabel}>Comments:</p>
         </div>
