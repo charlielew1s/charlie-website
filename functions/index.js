@@ -175,3 +175,78 @@ exports.deleteComment = functions.https.onCall(async (data, context) => {
     });
 });
   
+
+exports.createReply = functions.https.onCall((data, context) => {
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const reply = {
+      content: data.content,
+      commentId: data.commentId,
+      postId: data.postId,
+      userID: context.auth.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  return db.collection('replies').add(reply);
+});
+
+exports.editReply = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const { replyId, newContent } = data;
+  const replyDoc = await db.collection('replies').doc(replyId).get();
+
+  if (!replyDoc.exists) {
+      throw new functions.https.HttpsError('not-found', 'Reply not found.');
+  }
+
+  if (replyDoc.data().userID !== context.auth.uid) {
+      throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the reply.');
+  }
+
+  return db.collection('replies').doc(replyId).update({ content: newContent });
+});
+
+exports.deleteReply = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const { replyId } = data;
+  const replyDoc = await db.collection('replies').doc(replyId).get();
+
+  if (!replyDoc.exists) {
+      throw new functions.https.HttpsError('not-found', 'Reply not found.');
+  }
+
+  if (replyDoc.data().userID !== context.auth.uid) {
+      throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the reply.');
+  }
+
+  return db.collection('replies').doc(replyId).delete();
+});
+
+exports.getReplies = functions.https.onRequest((req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  cors(req, res, async () => {
+      try {
+          const commentId = req.query.commentId;
+          const repliesSnapshot = await db.collection('replies')
+                                         .where('commentId', '==', commentId)
+                                         .get();
+          const replies = [];
+          repliesSnapshot.forEach(doc => {
+              replies.push({ id: doc.id, ...doc.data() });
+          });
+          res.status(200).send({ data: replies });
+      } catch (error) {
+          console.error('Error fetching replies:', error);
+          res.status(500).send('Internal server error.');
+      }
+  });
+});
+
