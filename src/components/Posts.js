@@ -1,20 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useNavigate } from 'react-router-dom';
 import { auth, firestore } from './config';
 import EditPost from './EditPost';
 import DeletePost from './DeletePost';
 import CreateComment from './CreateComment';
-import EditComment from './EditComment';
-import DeleteComment from './DeleteComment';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import styles from './Posts.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const Posts = ({ data }) => {
     const [user] = useAuthState(auth);
     const navigate = useNavigate();
 
     const viewComments = (postId) => {
-        navigate(`/comments/${postId}`);
+        navigate(`/post/${postId}`);
     };
 
     return (

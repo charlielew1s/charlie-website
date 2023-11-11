@@ -1,42 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { auth, provider } from "./config";
-import { signInWithPopup } from "firebase/auth";
-import Home from "./Home";
-import styles from './SignIn.module.css';
-import Posts from './Posts';
+import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
+import Posts from './Posts'; // Ensure this import is correct
 import { getFunctions, httpsCallable } from "firebase/functions";
+import styles from './SignIn.module.css';
 
-
-function SignIn({ onSignIn }) { // Ensure onSignIn is included here
-    const [userEmail, setUserEmail] = useState(null);
-
-
-    const signIn = () => {
-        signInWithPopup(auth, provider)
-            .then((data) => {
-                const email = data.user.email;
-                localStorage.setItem("email", email);
-                onSignIn(email); // Call the callback function
-            })
-            .catch((error) => {
-                console.error("Error during sign-in:", error);
-            });
-    };
-
-    useEffect(() => {
-        const storedEmail = localStorage.getItem('email');
-        if (storedEmail) {
-            setUserEmail(storedEmail);
-        }
-    }, []);
-
+function SignIn() {
+    const [user, setUser] = useState(null);
     const [postData, setPostData] = useState([]);
 
+    // User authentication state check
     useEffect(() => {
-        callFirebaseFunction();
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+    
+        return () => unsubscribe();
     }, []);
+    
+    
 
-    const callFirebaseFunction = () => {
+    // Fetching posts
+    useEffect(() => {
         const functions = getFunctions();
         const getPosts = httpsCallable(functions, 'getPosts');
         getPosts()
@@ -46,20 +31,30 @@ function SignIn({ onSignIn }) { // Ensure onSignIn is included here
             .catch((error) => {
                 console.error("Error fetching posts:", error);
             });
-    }
+    }, []);
+    
+
+
+    const signIn = () => {
+        signInWithPopup(auth, provider)
+            .catch((error) => {
+                console.error("Error during sign-in:", error);
+            });
+    };
+
     return (
         <>
-            <div className={styles.signInBanner}>RedditSimilar</div>
-            <button className={styles.signInButton} onClick={signIn}>Sign in with Google</button>
+            <div className={styles.signInBanner}>RedditSimilar
+                {!user && (
+                    <button className={styles.signInButton} onClick={signIn}>
+                        Sign in with Google
+                    </button>
+                )}
+            </div>
             <div className={styles.mainLayout}>
                 <div className={styles.signInContainer}>
-                    {userEmail ? (
-                        <Home userEmail={userEmail} />
-                    ) : (
-                        null
-                    )}
                     {postData.length > 0 ? (
-                        <Posts data={postData} />
+                        <Posts data={postData} user={user} />
                     ) : (
                         <p>No posts available.</p>
                     )}
@@ -67,6 +62,8 @@ function SignIn({ onSignIn }) { // Ensure onSignIn is included here
             </div>
         </>
     );
+    
+    
 }
 
 export default SignIn;
