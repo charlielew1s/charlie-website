@@ -6,20 +6,8 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
-function setCORSHeaders(req, res) {
-    if (req.method === 'OPTIONS') {
-        res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-}
-
 exports.getPosts = functions.https.onRequest((req, res) => {
-    setCORSHeaders(req, res);
-    if (req.method === 'OPTIONS') {
-        return;
-    }
+    res.set('Access-Control-Allow-Origin', '*');
     cors(req, res, async () => {
         try {
             const postsSnapshot = await db.collection('posts').get();
@@ -36,10 +24,7 @@ exports.getPosts = functions.https.onRequest((req, res) => {
 });
 
 exports.createPost = functions.https.onRequest((req, res) => {
-    setCORSHeaders(req, res);
-    if (req.method === 'OPTIONS') {
-        return;
-    }
+    res.set('Access-Control-Allow-Origin', '*');
     cors(req, res, async () => {
         try {
             const { content, name, userID } = JSON.parse(req.body);
@@ -57,10 +42,7 @@ exports.createPost = functions.https.onRequest((req, res) => {
 
 
 exports.editPost = functions.https.onRequest((req, res) => {
-  setCORSHeaders(req, res);
-  if (req.method === 'OPTIONS') {
-      return;
-  }
+  res.set('Access-Control-Allow-Origin', '*');
   cors(req, res, async () => {
       if (!req.context.auth) {
           res.status(401).send('User must be authenticated.');
@@ -80,10 +62,7 @@ exports.editPost = functions.https.onRequest((req, res) => {
 
 
 exports.deletePost = functions.https.onRequest((req, res) => {
-  setCORSHeaders(req, res);
-  if (req.method === 'OPTIONS') {
-      return;
-  }
+  res.set('Access-Control-Allow-Origin', '*');
   cors(req, res, async () => {
       if (!req.context.auth) {
           res.status(401).send('User must be authenticated.');
@@ -102,10 +81,7 @@ exports.deletePost = functions.https.onRequest((req, res) => {
 });
 
 exports.getComments = functions.https.onRequest((req, res) => {
-  setCORSHeaders(req, res);
-  if (req.method === 'OPTIONS') {
-      return;
-  }
+  res.set('Access-Control-Allow-Origin', '*');
   cors(req, res, async () => {
       try {
           const postId = req.query.postId; // Assuming the postId is passed as a query parameter
@@ -130,10 +106,7 @@ exports.getComments = functions.https.onRequest((req, res) => {
 
 // Function to create a comment for a specific post
 exports.createComment = functions.https.onRequest((req, res) => {
-  setCORSHeaders(req, res);
-  if (req.method === 'OPTIONS') {
-      return;
-  }
+  res.set('Access-Control-Allow-Origin', '*');
   cors(req, res, async () => {
       try {
           const { postId, content } = JSON.parse(req.body);
@@ -158,10 +131,7 @@ exports.createComment = functions.https.onRequest((req, res) => {
 
 // Function to edit a comment
 exports.editComment = functions.https.onRequest((req, res) => {
-  setCORSHeaders(req, res);
-  if (req.method === 'OPTIONS') {
-      return;
-  }
+  res.set('Access-Control-Allow-Origin', '*');
   cors(req, res, async () => {
       if (!req.context.auth) {
           res.status(401).send('User must be authenticated.');
@@ -196,10 +166,7 @@ exports.editComment = functions.https.onRequest((req, res) => {
 
 // Function to delete a comment
 exports.deleteComment = functions.https.onRequest((req, res) => {
-  setCORSHeaders(req, res);
-  if (req.method === 'OPTIONS') {
-      return;
-  }
+  res.set('Access-Control-Allow-Origin', '*');
   cors(req, res, async () => {
       if (!req.context.auth) {
           res.status(401).send('User must be authenticated.');
