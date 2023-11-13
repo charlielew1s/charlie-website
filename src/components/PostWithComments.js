@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { firestore } from './components/config'; // Update this path as needed
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import styles from './Home.module.css'; // Assuming this contains the necessary styles
+import { firestore } from './config'; // Ensure this path is correct
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import EditComment from './EditComment';
+import DeleteComment from './DeleteComment';
+import styles from './Posts.module.css';
 
 const PostWithComments = () => {
     const { postId } = useParams();
@@ -11,14 +13,12 @@ const PostWithComments = () => {
 
     useEffect(() => {
         const fetchPostAndComments = async () => {
-            // Fetching the post
             const postRef = doc(firestore, 'posts', postId);
-            const postSnap = await getDoc(postRef);
-            if (postSnap.exists()) {
-                setPost({ id: postSnap.id, ...postSnap.data() });
+            const postDoc = await getDoc(postRef);
+            if (postDoc.exists()) {
+                setPost({ id: postDoc.id, ...postDoc.data() });
             }
 
-            // Fetching comments
             const commentsQuery = query(collection(firestore, 'comments'), where('postId', '==', postId));
             const commentsSnapshot = await getDocs(commentsQuery);
             const fetchedComments = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -34,13 +34,15 @@ const PostWithComments = () => {
                 <div className={styles.postContainer}>
                     <div><strong>{post.name}</strong></div>
                     <div>{post.content}</div>
+                    {/* Additional post details if needed */}
                 </div>
             )}
             <div>
                 {comments.map(comment => (
                     <div key={comment.id} className={styles.commentContainer}>
                         <p>{comment.content}</p>
-                        {/* Implement EditComment and DeleteComment functionality here */}
+                        <EditComment comment={comment} />
+                        <DeleteComment commentId={comment.id} />
                     </div>
                 ))}
             </div>

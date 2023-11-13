@@ -14,7 +14,7 @@ function Home() {
         const getPosts = httpsCallable(functions, 'getPosts');
         getPosts()
             .then((result) => {
-                setPostData(result.data || []);
+                setPostData(result.data.data || []);
             })
             .catch((error) => {
                 console.error("Error fetching posts:", error);
@@ -30,14 +30,10 @@ function Home() {
     return (
         <>
             <div className={styles.homeBanner}>RedditSimilar</div>
-            <button className={styles.logoutButton} style={{ position: 'absolute', top: 10, right: 10 }} onClick={logout}>Logout</button>
+            <button className={styles.logoutButton} onClick={logout}>Logout</button>
             <div className={styles.homeContainer}>
                 <CreatePost />
-                {postData.length > 0 ? (
-                    <Posts data={postData} />
-                ) : (
-                    <p>No posts available.</p>
-                )}
+                <Posts data={postData} user={auth.currentUser} />
             </div>
         </>
     );

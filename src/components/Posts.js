@@ -1,21 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firestore } from './config';
+import React from 'react';
+import styles from './Posts.module.css';
 import EditPost from './EditPost';
 import DeletePost from './DeletePost';
-import CreateComment from './CreateComment';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import styles from './Posts.module.css';
-import { useNavigate } from 'react-router-dom';
 
-const Posts = ({ data }) => {
-    const [user] = useAuthState(auth);
-    const navigate = useNavigate();
-
-    const viewComments = (postId) => {
-        navigate(`/post/${postId}`);
-    };
-
+const Posts = ({ data, user }) => {
     return (
         <div>
             {data.map((post) => (
@@ -28,8 +16,7 @@ const Posts = ({ data }) => {
                     )}
                     <div><strong>{post.name}</strong></div>
                     <div>{post.content}</div>
-                    {user && <CreateComment postId={post.id} />}
-                    <button onClick={() => viewComments(post.id)}>Comments</button>
+                    {/* other post details */}
                 </div>
             ))}
         </div>
@@ -37,4 +24,3 @@ const Posts = ({ data }) => {
 };
 
 export default Posts;
-

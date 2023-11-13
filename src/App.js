@@ -4,17 +4,16 @@ import Home from './components/Home';
 import SignIn from './components/SignIn';
 import PostComments from './components/PostComments';
 
+
 function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<SignIn />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/post/:postId" element={<PostComments />} />
-                {/* other routes */}
+                <Route path="/post/:postId" element={<PostComments />} />              
             </Routes>
         </Router>
     );
 }
-
-export default App;
+export default App
