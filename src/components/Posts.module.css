@@ -1,0 +1,42 @@
+.postContainer {
+  border: 10px solid #c33dd0; /* Purple outline */
+  padding: 10px;
+  margin: 10px auto 0 auto; /* No bottom margin */
+  border-radius: 5px;
+  max-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.commentContainer {
+  border: 10px solid #FFA500; /* Orange outline */
+  padding: 10px;
+  margin: 0 auto; /* No margin */
+  border-radius: 5px;
+  max-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* This class adds space after the last comment */
+.lastCommentContainer {
+  border: 10px solid #FFA500; /* Orange outline */
+  padding: 10px;
+  margin: 0 auto 30px auto; /* Large bottom margin for the last comment */
+  border-radius: 5px;
+  max-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* This class adds space after the last comment if there are no comments */
+.spaceAfterComments {
+  margin-bottom: 100px; /* Large bottom margin after comments section */
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
+}

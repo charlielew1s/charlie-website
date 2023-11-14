@@ -3,24 +3,22 @@ import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, provider } from './config';
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
-const EditPost = ({ post }) => {
+const CreateComment = ({ postId }) => {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState(post.name);
-  const [content, setContent] = useState(post.content);
+  const [comment, setComment] = useState('');
   const auth = getAuth();
   const [user] = useAuthState(auth);
 
@@ -33,17 +31,18 @@ const EditPost = ({ post }) => {
       return;
     }
 
-    const updatedPost = {
-      name: title,
-      content: content,
+    const newComment = {
+      postId: postId,
+      content: comment,
       userID: user.uid
     };
 
     const functions = getFunctions();
-    const editPost = httpsCallable(functions, 'editPost');
-    editPost({ postId: post.id, ...updatedPost })
+    const createComment = httpsCallable(functions, 'createComment');
+    createComment(newComment)
       .then((result) => {
         console.log(result);
+        setComment(''); // Clear the comment field after submission
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -54,42 +53,34 @@ const EditPost = ({ post }) => {
 
   return (
     <div>
-      <button onClick={handleOpen}>Edit Post</button>
+      <button onClick={handleOpen}>Create Comment</button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Edit Post
+            Write a Comment
           </Typography>
           <TextField
             autoFocus
             margin="dense"
-            id="title"
-            label="Title"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            id="content"
-            label="Content"
+            id="comment"
+            label="Comment"
             type="text"
             fullWidth
             multiline
             rows={4}
             variant="standard"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
           />
-          <Button onClick={handleSubmit} color="primary">
-            Update
-          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Button onClick={handleSubmit} color="primary">
+              Submit
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </div>
   );
 }
 
-export default EditPost;
+export default CreateComment;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
+import PostDetails from './components/PostDetails';
 
 function App() {
   const [userEmail, setUserEmail] = useState(null);
@@ -12,10 +14,19 @@ function App() {
     }
   }, []);
 
+  const handleSignOut = () => {
+    setUserEmail(null);
+  };
+
   return (
-    <div>
-      {userEmail ? <Home userEmail={userEmail} /> : <SignIn onSignIn={setUserEmail} />}
-    </div>
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
+          <Route path="/post/:postId" element={<PostDetails />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
