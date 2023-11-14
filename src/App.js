@@ -1,19 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './components/Home';
 import SignIn from './components/SignIn';
-import PostComments from './components/PostComments';
-
+import Home from './components/Home';
+import PostDetails from './components/PostDetails';
 
 function App() {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<SignIn />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/post/:postId" element={<PostComments />} />              
-            </Routes>
-        </Router>
-    );
+  const [userEmail, setUserEmail] = useState(null);
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+  }, []);
+
+  const handleSignOut = () => {
+    setUserEmail(null);
+  };
+
+  return (
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
+          <Route path="/post/:postId" element={<PostDetails />} />
+        </Routes>
+      </div>
+    </Router>
+  );
 }
-export default App
+
+export default App;

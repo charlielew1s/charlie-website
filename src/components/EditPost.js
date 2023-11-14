@@ -3,6 +3,7 @@ import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, provider } from './config';
 
 const style = {
     position: 'absolute',

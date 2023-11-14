@@ -1,8 +1,9 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const cors = require('cors')({ origin: true });
+const { Firestore } = require('firebase-admin/firestore');
+const cors = require('cors')({origin: true});
 
-admin.initializeApp();
+admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
 
@@ -11,191 +12,167 @@ exports.getPosts = functions.https.onRequest((req, res) => {
     cors(req, res, async () => {
         try {
             const postsSnapshot = await db.collection('posts').get();
-            const posts = postsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            res.status(200).send({ data: posts });
+            const posts = [];
+            postsSnapshot.forEach(doc => {
+                posts.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            res.status(200).send({ data: posts })
         } catch (error) {
             console.error('Error fetching posts:', error);
             res.status(500).send('Internal server error.');
         }
-    });
+    })
 });
 
-exports.createPost = functions.https.onRequest((req, res) => {
+exports.createPost = functions.https.onCall((data, context) => {
+    // Ensure the user is authenticated.
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            'unauthenticated', 
+            'The function must be called while authenticated.'
+        );
+    }
+
+    const post = {
+        content: data.content,
+        name: data.name,
+        userID: data.userID 
+    };
+
+    return admin.firestore().collection('posts').add(post);
+});
+
+exports.editPost = functions.https.onCall((data, context) => {
+    // Check for authentication
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+  
+    const { postId, name, content } = data;
+    return admin.firestore().collection('posts').doc(postId).update({ name, content })
+      .then(() => {
+        return { status: 'success', message: 'Post updated successfully' };
+      })
+      .catch(error => {
+        throw new functions.https.HttpsError('unknown', error.message, error);
+      });
+  });
+
+  exports.deletePost = functions.https.onCall((data, context) => {
+    // Check for authentication
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+    }
+  
+    const { postId } = data;
+    return admin.firestore().collection('posts').doc(postId).delete()
+      .then(() => {
+        return { status: 'success', message: 'Post deleted successfully' };
+      })
+      .catch(error => {
+        throw new functions.https.HttpsError('unknown', error.message, error);
+      });
+  });
+
+  exports.getComments = functions.https.onRequest((req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     cors(req, res, async () => {
         try {
-            const { content, name, userID } = JSON.parse(req.body);
-            const post = { content, name, userID };
-            const result = await db.collection('posts').add(post);
-            res.status(200).send({ id: result.id, ...post });
+            const postId = req.query.postId; // Assuming the postId is passed as a query parameter
+            const commentsSnapshot = await db.collection('comments')
+                                            .where('postId', '==', postId)
+                                            .get();
+            const comments = [];
+            commentsSnapshot.forEach(doc => {
+                comments.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            res.status(200).send({ data: comments });
         } catch (error) {
-            console.error('Error creating post:', error);
+            console.error('Error fetching comments:', error);
             res.status(500).send('Internal server error.');
         }
     });
 });
 
-// Apply similar changes to other functions like 'editPost', 'deletePost', 'getComments', etc.
-
-
-exports.editPost = functions.https.onRequest((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  cors(req, res, async () => {
-      if (!req.context.auth) {
-          res.status(401).send('User must be authenticated.');
-          return;
-      }
-      const { postId, name, content } = JSON.parse(req.body);
-      db.collection('posts').doc(postId).update({ name, content })
-          .then(() => {
-              res.status(200).send({ status: 'success', message: 'Post updated successfully' });
-          })
-          .catch(error => {
-              console.error('Error updating post:', error);
-              res.status(500).send('Internal server error.');
-          });
-  });
-});
-
-
-exports.deletePost = functions.https.onRequest((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  cors(req, res, async () => {
-      if (!req.context.auth) {
-          res.status(401).send('User must be authenticated.');
-          return;
-      }
-      const { postId } = JSON.parse(req.body);
-      db.collection('posts').doc(postId).delete()
-          .then(() => {
-              res.status(200).send({ status: 'success', message: 'Post deleted successfully' });
-          })
-          .catch(error => {
-              console.error('Error deleting post:', error);
-              res.status(500).send('Internal server error.');
-          });
-  });
-});
-
-exports.getComments = functions.https.onRequest((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  cors(req, res, async () => {
-      try {
-          const postId = req.query.postId; // Assuming the postId is passed as a query parameter
-          const commentsSnapshot = await db.collection('comments')
-                                          .where('postId', '==', postId)
-                                          .get();
-          const comments = [];
-          commentsSnapshot.forEach(doc => {
-              comments.push({
-                  id: doc.id,
-                  ...doc.data()
-              });
-          });
-          res.status(200).send({ data: comments });
-      } catch (error) {
-          console.error('Error fetching comments:', error);
-          res.status(500).send('Internal server error.');
-      }
-  });
-});
-
-
 // Function to create a comment for a specific post
-exports.createComment = functions.https.onRequest((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  cors(req, res, async () => {
-      try {
-          const { postId, content } = JSON.parse(req.body);
-          const userID = req.context.auth.uid; // Use the UID from the authenticated user
+exports.createComment = functions.https.onCall((data, context) => {
+    // Ensure the user is authenticated.
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            'unauthenticated', 
+            'The function must be called while authenticated.'
+        );
+    }
 
-          const comment = {
-              postId,
-              content,
-              userID,
-              createdAt: admin.firestore.FieldValue.serverTimestamp()
-          };
+    const comment = {
+        postId: data.postId,
+        content: data.content,
+        userID: context.auth.uid, // Use the UID from the authenticated user
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+    };
 
-          const result = await db.collection('comments').add(comment);
-          res.status(200).send({ id: result.id, ...comment });
-      } catch (error) {
-          console.error('Error creating comment:', error);
-          res.status(500).send('Internal server error.');
-      }
-  });
+    return db.collection('comments').add(comment);
 });
-
 
 // Function to edit a comment
-exports.editComment = functions.https.onRequest((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  cors(req, res, async () => {
-      if (!req.context.auth) {
-          res.status(401).send('User must be authenticated.');
-          return;
-      }
+exports.editComment = functions.https.onCall(async (data, context) => {
+  // Check for authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
 
-      const { commentId, newContent } = JSON.parse(req.body);
-      const commentDoc = await db.collection('comments').doc(commentId).get();
+  const { commentId, newContent } = data;
+  const commentDoc = await db.collection('comments').doc(commentId).get();
 
-      if (!commentDoc.exists) {
-          res.status(404).send('Comment not found.');
-          return;
-      }
+  if (!commentDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'Comment not found.');
+  }
 
-      if (commentDoc.data().userID !== req.context.auth.uid) {
-          res.status(403).send('User is not the owner of the comment.');
-          return;
-      }
+  if (commentDoc.data().userID !== context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the comment.');
+  }
 
-      db.collection('comments').doc(commentId).update({ content: newContent })
-          .then(() => {
-              res.status(200).send({ status: 'success', message: 'Comment edited successfully' });
-          })
-          .catch(error => {
-              console.error('Error editing comment:', error);
-              res.status(500).send('Internal server error.');
-          });
-  });
+  return db.collection('comments').doc(commentId).update({ content: newContent })
+    .then(() => {
+      return { status: 'success', message: 'Comment edited successfully' };
+    })
+    .catch(error => {
+      throw new functions.https.HttpsError('unknown', error.message, error);
+    });
 });
-
 
 
 // Function to delete a comment
-exports.deleteComment = functions.https.onRequest((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  cors(req, res, async () => {
-      if (!req.context.auth) {
-          res.status(401).send('User must be authenticated.');
-          return;
-      }
+exports.deleteComment = functions.https.onCall(async (data, context) => {
+  // Check for authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
 
-      const { commentId } = JSON.parse(req.body);
-      const commentDoc = await db.collection('comments').doc(commentId).get();
+  const { commentId } = data;
+  const commentDoc = await db.collection('comments').doc(commentId).get();
 
-      if (!commentDoc.exists) {
-          res.status(404).send('Comment not found.');
-          return;
-      }
+  if (!commentDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'Comment not found.');
+  }
 
-      if (commentDoc.data().userID !== req.context.auth.uid) {
-          res.status(403).send('User is not the owner of the comment.');
-          return;
-      }
+  if (commentDoc.data().userID !== context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the comment.');
+  }
 
-      db.collection('comments').doc(commentId).delete()
-          .then(() => {
-              res.status(200).send({ status: 'success', message: 'Comment deleted successfully' });
-          })
-          .catch(error => {
-              console.error('Error deleting comment:', error);
-              res.status(500).send('Internal server error.');
-          });
-  });
+  return db.collection('comments').doc(commentId).delete()
+    .then(() => {
+      return { status: 'success', message: 'Comment deleted successfully' };
+    })
+    .catch(error => {
+      throw new functions.https.HttpsError('unknown', error.message, error);
+    });
 });
-
   
 

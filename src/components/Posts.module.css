@@ -37,6 +37,6 @@
 .buttonContainer {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start; /* Updated for cross-browser compatibility */
+  justify-content: flex-start;
   gap: 10px;
 }
