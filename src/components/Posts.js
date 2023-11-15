@@ -9,6 +9,7 @@ import DeleteComment from './DeleteComment';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import styles from './Posts.module.css'; // Import the CSS module here
+import CommentIcon from '@mui/icons-material/Comment';
 
 // Comment component placeholder
 const Comment = ({ comment, currentUser, isLastComment }) => (
@@ -64,11 +65,9 @@ const Posts = ({ data }) => {
             <div>{post.content}</div>
             <br></br>
             {user && <CreateComment postId={post.id} />}
-            <button>
-                <Link to={`/post/${post.id}`}>
-                    {showComments[post.id] ? 'Hide Comments' : 'Show Comments'}
-                </Link>
-            </button>
+            <Link to={`/post/${post.id}`}>
+                <CommentIcon></CommentIcon>
+            </Link>
             {showComments[post.id] && <p className={styles.commentsLabel}>Comments:</p>}
           </div>
           {showComments[post.id] && comments[post.id] && comments[post.id].map((comment, commentIndex, commentArray) => (

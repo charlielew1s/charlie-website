@@ -5,6 +5,7 @@ import CreatePost from './CreatePost';
 import { signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { auth, provider } from './config';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 function Home({ userEmail, onSignOut }) {
     const [postData, setPostData] = useState([]);
@@ -40,8 +41,7 @@ function Home({ userEmail, onSignOut }) {
     return (
         <>
             <div className={styles.homeBanner}>RedditSimilar</div>
-            <button className={styles.logoutButton} onClick={logout}>Logout</button>
-            <button className={styles.createPostButton}>Create Post</button> {/* Assuming you have this button */}
+            <LogoutIcon className={styles.logoutButton} onClick={logout}>Logout</LogoutIcon>
 
             <div className={styles.homeContainer}>
                 {/* Render the CreatePost component */}

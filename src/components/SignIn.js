@@ -5,6 +5,7 @@ import Home from "./Home";
 import styles from './SignIn.module.css';
 import Posts from './Posts';
 import { getFunctions, httpsCallable } from "firebase/functions";
+import LoginIcon from '@mui/icons-material/Login';
 
 
 function SignIn({ onSignIn }) { // Ensure onSignIn is included here
@@ -50,7 +51,7 @@ function SignIn({ onSignIn }) { // Ensure onSignIn is included here
     return (
         <>
             <div className={styles.signInBanner}>RedditSimilar</div>
-            <button className={styles.signInButton} onClick={signIn}>Sign in with Google</button>
+            <LoginIcon className={styles.signInButton} onClick={signIn}>Sign in with Google</LoginIcon>
             <div className={styles.mainLayout}>
                 <div className={styles.signInContainer}>
                     {userEmail ? (

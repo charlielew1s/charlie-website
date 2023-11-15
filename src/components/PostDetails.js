@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth'; // Import useAuthState
-import { auth } from './config'; // Ensure you have auth exported from config
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from './config';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from './config';
 import styles from './Posts.module.css';
 import pagestyles from './Home.module.css';
 import EditComment from './EditComment';
 import DeleteComment from './DeleteComment';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const PostDetails = () => {
   const { postId } = useParams();
-  const [user] = useAuthState(auth); // Get the current user
+  const [user] = useAuthState(auth);
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
+  const navigate = useNavigate(); // Move the useNavigate hook to the outer scope
+
+  const handleClick = () => {
+    // Navigate to the Home page
+    navigate('/');
+  };
 
   useEffect(() => {
     const fetchPostAndComments = async () => {
@@ -23,7 +31,7 @@ const PostDetails = () => {
       if (postDoc.exists()) {
         setPost({ id: postDoc.id, ...postDoc.data() });
       }
-  
+
       // Fetch comments data
       const commentsQuery = query(collection(firestore, 'comments'), where('postId', '==', postId));
       const commentsSnapshot = await getDocs(commentsQuery);
@@ -33,7 +41,7 @@ const PostDetails = () => {
       });
       setComments(commentsData);
     };
-  
+
     fetchPostAndComments();
   }, [postId]);
 
@@ -45,7 +53,11 @@ const PostDetails = () => {
     <div>
       <div className={pagestyles.homeBanner}>
         RedditSimilar
-        <div className={pagestyles.logoutButton}>Press back arrow on your browser to go back</div>
+        <div className={pagestyles.createPostButton}>
+          <ArrowBackIcon onClick={handleClick}>
+            Return Home
+          </ArrowBackIcon>
+        </div>
       </div>
       <div className={pagestyles.homeContainer}>
         <div className={styles.postContainer}>
@@ -56,16 +68,16 @@ const PostDetails = () => {
           {comments.map(comment => (
             <div key={comment.id} className={styles.commentContainer}>
               <p>{comment.content}</p>
-                <div>
-                  <EditComment comment={comment} />
-                  <DeleteComment commentId={comment.id} />
-                </div>
+              <div>
+                <EditComment comment={comment} />
+                <DeleteComment commentId={comment.id} />
+              </div>
             </div>
           ))}
         </div>
       </div>
     </div>
   );
-}  
+};
 
-export default PostDetails
+export default PostDetails;

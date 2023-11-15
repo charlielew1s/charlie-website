@@ -3,6 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const DeleteComment = ({ commentId }) => {
     const auth = getAuth();
@@ -37,9 +38,7 @@ const DeleteComment = ({ commentId }) => {
 
     return (
         <div>
-            <button variant="outlined" color="error" onClick={handleClickOpen}>
-                Delete Comment
-            </button>
+            <DeleteIcon onClick={handleClickOpen}></DeleteIcon>
             <Dialog
                 open={open}
                 onClose={handleClose}

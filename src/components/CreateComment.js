@@ -3,6 +3,7 @@ import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import AddCommentIcon from '@mui/icons-material/AddComment';
 
 const style = {
   position: 'absolute',
@@ -53,7 +54,7 @@ const CreateComment = ({ postId }) => {
 
   return (
     <div>
-      <button onClick={handleOpen}>Create Comment</button>
+      <AddCommentIcon onClick={handleOpen}></AddCommentIcon>
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
