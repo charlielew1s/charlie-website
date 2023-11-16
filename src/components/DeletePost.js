@@ -3,6 +3,7 @@ import { Box, Button, Typography, Modal } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const style = {
     position: 'absolute',
@@ -45,7 +46,7 @@ const DeletePost = ({ postId }) => {
 
   return (
     <div>
-      <button onClick={handleOpen}>Delete Post</button>
+      <DeleteIcon onClick={handleOpen}></DeleteIcon>
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">

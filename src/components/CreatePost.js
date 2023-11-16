@@ -8,6 +8,7 @@ import styles from './CreatePost.module.css';
 import { getAuth } from 'firebase/auth'; // Import Firebase Authentication
 import { useAuthState } from 'react-firebase-hooks/auth'; // Import the hook
 import { getFunctions, httpsCallable } from 'firebase/functions'; // Import Firebase Functions
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const style = {
   position: 'absolute',
@@ -61,7 +62,7 @@ export default function BasicModal() {
   return (
     <div>
         <div className={styles.modal_button}>
-            <button onClick={handleOpen}>Create Post</button>
+            <AddCircleIcon onClick={handleOpen}></AddCircleIcon>
         </div>
       <Modal
         open={open}
