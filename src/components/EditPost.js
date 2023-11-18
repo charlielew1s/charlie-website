@@ -5,6 +5,7 @@ import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, provider } from './config';
 import EditIcon from '@mui/icons-material/Edit';
+import PostDetails from './PostDetails';
 
 const style = {
     position: 'absolute',

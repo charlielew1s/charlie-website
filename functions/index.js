@@ -175,4 +175,92 @@ exports.deleteComment = functions.https.onCall(async (data, context) => {
     });
 });
   
+exports.createReply = functions.https.onCall((data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const reply = {
+      content: data.content,
+      commentId: data.commentId,
+      userId: context.auth.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  return db.collection('replies').add(reply);
+});
+
+exports.getReplies = functions.https.onRequest((req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  cors(req, res, async () => {
+      try {
+          const commentId = req.query.commentId; // Assuming the commentId is passed as a query parameter
+          const repliesSnapshot = await db.collection('replies')
+                                          .where('commentId', '==', commentId)
+                                          .orderBy('createdAt')
+                                          .get();
+          const replies = [];
+          repliesSnapshot.forEach(doc => {
+              replies.push({
+                  id: doc.id,
+                  ...doc.data()
+              });
+          });
+          res.status(200).send({ data: replies });
+      } catch (error) {
+          console.error('Error fetching replies:', error);
+          res.status(500).send('Internal server error.');
+      }
+  });
+});
+
+exports.editReply = functions.https.onCall((data, context) => {
+  // Check for authentication
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const { replyId, newContent } = data;
+
+  const replyRef = db.collection('replies').doc(replyId);
+  return replyRef.get().then(doc => {
+      if (!doc.exists) {
+          throw new functions.https.HttpsError('not-found', 'Reply not found.');
+      }
+      if (doc.data().userId !== context.auth.uid) {
+          throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the reply.');
+      }
+      return replyRef.update({ content: newContent });
+  })
+  .then(() => ({ status: 'success', message: 'Reply updated successfully' }))
+  .catch(error => {
+      throw new functions.https.HttpsError('unknown', error.message, error);
+  });
+});
+
+exports.deleteReply = functions.https.onCall((data, context) => {
+  // Check for authentication
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const { replyId } = data;
+
+  const replyRef = db.collection('replies').doc(replyId);
+  return replyRef.get().then(doc => {
+      if (!doc.exists) {
+          throw new functions.https.HttpsError('not-found', 'Reply not found.');
+      }
+      if (doc.data().userId !== context.auth.uid) {
+          throw new functions.https.HttpsError('permission-denied', 'User is not the owner of the reply.');
+      }
+      return replyRef.delete();
+  })
+  .then(() => ({ status: 'success', message: 'Reply deleted successfully' }))
+  .catch(error => {
+      throw new functions.https.HttpsError('unknown', error.message, error);
+  });
+});
+
 
