@@ -8,6 +8,10 @@ import CreateReply from './CreateReply';
 import EditReply from './EditReply';
 import DeleteReply from './DeleteReply';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import homestyles from './Home.module.css'
+import poststyles from './Posts.module.css'
+import { Link, useNavigate } from 'react-router-dom'; // useNavigate for redirection
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -15,7 +19,7 @@ const PostDetails = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [replies, setReplies] = useState({});
-  const [showReplies, setShowReplies] = useState({});
+  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -26,49 +30,51 @@ const PostDetails = () => {
     };
 
     fetchPost();
-  }, [postId]);
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      const q = query(collection(firestore, 'comments'), where('postId', '==', postId));
-      const commentsSnapshot = await getDocs(q);
-      let newComments = [];
-      commentsSnapshot.forEach(doc => {
-        newComments.push({ id: doc.id, ...doc.data() });
-      });
-      setComments(newComments);
-    };
-
     fetchComments();
   }, [postId]);
 
-  const toggleReplies = (commentId) => {
-    setShowReplies(prev => ({ ...prev, [commentId]: !prev[commentId] }));
-    if (!replies[commentId]) {
-      fetchReplies(commentId);
-    }
+  const fetchComments = async () => {
+    const q = query(collection(firestore, 'comments'), where('postId', '==', postId));
+    const commentsSnapshot = await getDocs(q);
+    const newComments = [];
+    commentsSnapshot.forEach(doc => {
+      newComments.push({ id: doc.id, ...doc.data() });
+    });
+    setComments(newComments);
   };
 
   const fetchReplies = async (commentId) => {
     const q = query(collection(firestore, 'replies'), where('commentId', '==', commentId), orderBy('createdAt'));
     const repliesSnapshot = await getDocs(q);
-    let newReplies = {};
+    const newReplies = [];
     repliesSnapshot.forEach(doc => {
-      newReplies[doc.id] = { id: doc.id, ...doc.data() };
+      newReplies.push({ id: doc.id, ...doc.data() });
     });
     setReplies(prevReplies => ({ ...prevReplies, [commentId]: newReplies }));
   };
+
+  useEffect(() => {
+    comments.forEach(comment => {
+      fetchReplies(comment.id);
+    });
+  }, [comments]);
 
   if (!post) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div>
-      <h1>{post.title}</h1>
+  <>
+    <div className={homestyles.homeBanner}>
+      RedditSimilar
+      <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)}>
+    </ArrowBackIcon>
+    </div>
+    <div className={homestyles.homeContainer}>
+      <h2>{post.title}</h2>
       <p>{post.content}</p>
       {comments.map(comment => (
-        <div key={comment.id}>
+        <div key={comment.id} className={poststyles.commentContainer}>
           <p>{comment.content}</p>
           {user && user.uid === comment.userId && (
             <>
@@ -76,28 +82,22 @@ const PostDetails = () => {
               <DeleteComment commentId={comment.id} />
             </>
           )}
-          <button onClick={() => toggleReplies(comment.id)}>
-            {showReplies[comment.id] ? 'Hide Replies' : 'Show Replies'}
-          </button>
-          {showReplies[comment.id] && (
-            <div>
-              {replies[comment.id] && Object.values(replies[comment.id]).map(reply => (
-                <div key={reply.id}>
-                  <p>{reply.content}</p>
-                  {user && user.uid === reply.userId && (
-                    <>
-                      <EditReply reply={reply} />
-                      <DeleteReply replyId={reply.id} />
-                    </>
-                  )}
-                </div>
-              ))}
-              <CreateReply commentId={comment.id} />
+          <CreateReply commentId={comment.id} />
+          {replies[comment.id] && replies[comment.id].map(reply => (
+            <div key={reply.id} className={poststyles.replyContainer}>
+              <p>{reply.content}</p>
+              {user && user.uid === reply.userId && (
+                <>
+                  <EditReply reply={reply} />
+                  <DeleteReply replyId={reply.id} />
+                </>
+              )}
             </div>
-          )}
+          ))}
         </div>
       ))}
     </div>
+  </>
   );
 };
 
