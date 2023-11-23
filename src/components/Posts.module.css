@@ -13,7 +13,7 @@
 }
 
 .replyContainer {
-  border-left: 3px solid #90ee90; /* Light green border for replies */
+  border-left: 3px solid #ccc; /* Light green border for replies */
   margin-left: 10px;
   padding-left: 10px;
   margin-top: 10px;

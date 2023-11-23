@@ -3,6 +3,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const DeleteReply = ({ replyId }) => {
   const [open, setOpen] = useState(false);
@@ -31,9 +33,7 @@ const DeleteReply = ({ replyId }) => {
 
   return (
     <div>
-      <Button variant="outlined" color="secondary" onClick={handleClickOpen}>
-        Delete Reply
-      </Button>
+      <DeleteIcon onClick={handleClickOpen}></DeleteIcon>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{"Confirm Delete"}</DialogTitle>
         <DialogContent>

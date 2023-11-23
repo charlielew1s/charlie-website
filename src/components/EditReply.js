@@ -3,6 +3,7 @@ import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
+import EditIcon from '@mui/icons-material/Edit';
 
 const modalStyle = {
     position: 'absolute',
@@ -46,9 +47,7 @@ const EditReply = ({ reply }) => {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleOpen}>
-        Edit Reply
-      </Button>
+      <EditIcon onClick={handleOpen}> </EditIcon>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">

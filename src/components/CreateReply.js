@@ -3,6 +3,8 @@ import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
+import CommentIcon from '@mui/icons-material/Comment';
+
 
 const modalStyle = {
   position: 'absolute',
@@ -52,9 +54,9 @@ const CreateReply = ({ commentId }) => {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleOpen}>
+      <CommentIcon onClick={handleOpen}>
         Reply
-      </Button>
+      </CommentIcon>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
