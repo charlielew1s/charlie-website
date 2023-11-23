@@ -12,6 +12,7 @@ import homestyles from './Home.module.css'
 import poststyles from './Posts.module.css'
 import { Link, useNavigate } from 'react-router-dom'; // useNavigate for redirection
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CreateComment from './CreateComment';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -76,8 +77,9 @@ const PostDetails = () => {
       {comments.map(comment => (
         <div key={comment.id} className={poststyles.commentContainer}>
           <p>{comment.content}</p>
-          {user && user.uid === comment.userId && (
+          {user && user.uid === comment.userID && (
             <>
+              <CreateComment comment={comment.userID}/>
               <EditComment comment={comment} />
               <DeleteComment commentId={comment.id} />
             </>
