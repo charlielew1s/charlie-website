@@ -74,12 +74,12 @@ const PostDetails = () => {
     <div className={homestyles.homeContainer}>
       <h2>{post.title}</h2>
       <p>{post.content}</p>
+      <CreateComment postId={postId}/>
       {comments.map(comment => (
         <div key={comment.id} className={poststyles.commentContainer}>
           <p>{comment.content}</p>
           {user && user.uid === comment.userID && (
             <>
-              <CreateComment comment={comment.userID}/>
               <EditComment comment={comment} />
               <DeleteComment commentId={comment.id} />
             </>
