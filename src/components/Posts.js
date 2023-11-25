@@ -11,6 +11,7 @@ import CommentIcon from '@mui/icons-material/Comment';
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate(); // Hook for navigation
+  console.log(data);
 
   return (
     <div>
@@ -22,6 +23,7 @@ const Posts = ({ data }) => {
               <DeletePost postId={post.id} />
             </div>
           )}
+          <p>Posted by: {post.username}</p>
           <div><strong>{post.name}</strong></div>
           <div>{post.content}</div>
           {user && <CreateComment postId={post.id} />}

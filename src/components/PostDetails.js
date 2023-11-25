@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -75,6 +76,7 @@ const PostDetails = () => {
     </ArrowBackIcon>
     </div>
     <div className={homestyles.homeContainer}>
+      <p>Posted by: {post.username}</p>
       <h2>{post.name}</h2>
       <p>{post.content}</p>
       {user && user.uid === post.userID && (

@@ -28,22 +28,30 @@ exports.getPosts = functions.https.onRequest((req, res) => {
 });
 
 exports.createPost = functions.https.onCall((data, context) => {
-    // Ensure the user is authenticated.
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            'unauthenticated', 
-            'The function must be called while authenticated.'
-        );
-    }
+  // Ensure the user is authenticated.
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
 
-    const post = {
-        content: data.content,
-        name: data.name,
-        userID: data.userID 
-    };
+  const userId = context.auth.uid;
+  // Fetch the username from your users collection based on userId
+  return admin.firestore().collection('users').doc(userId).get()
+      .then(doc => {
+          if (!doc.exists) {
+              throw new functions.https.HttpsError('not-found', 'User not found.');
+          }
+          const username = doc.data().username;
+          const post = {
+              content: data.content,
+              name: data.name,
+              userID: userId,
+              username: username // Include the username here
+          };
 
-    return admin.firestore().collection('posts').add(post);
+          return admin.firestore().collection('posts').add(post);
+      });
 });
+
 
 exports.editPost = functions.https.onCall((data, context) => {
     // Check for authentication
@@ -102,23 +110,31 @@ exports.editPost = functions.https.onCall((data, context) => {
 
 // Function to create a comment for a specific post
 exports.createComment = functions.https.onCall((data, context) => {
-    // Ensure the user is authenticated.
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            'unauthenticated', 
-            'The function must be called while authenticated.'
-        );
-    }
+  // Ensure the user is authenticated.
+  if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
 
-    const comment = {
-        postId: data.postId,
-        content: data.content,
-        userID: context.auth.uid, // Use the UID from the authenticated user
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-    };
+  const userId = context.auth.uid;
+  // Fetch the username
+  return admin.firestore().collection('users').doc(userId).get()
+      .then(doc => {
+          if (!doc.exists) {
+              throw new functions.https.HttpsError('not-found', 'User not found.');
+          }
+          const username = doc.data().username;
+          const comment = {
+              postId: data.postId,
+              content: data.content,
+              userID: userId,
+              username: username, // Include the username
+              createdAt: admin.firestore.FieldValue.serverTimestamp()
+          };
 
-    return db.collection('comments').add(comment);
+          return db.collection('comments').add(comment);
+      });
 });
+
 
 // Function to edit a comment
 exports.editComment = functions.https.onCall(async (data, context) => {
@@ -181,15 +197,26 @@ exports.createReply = functions.https.onCall((data, context) => {
       throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
   }
 
-  const reply = {
-      content: data.content,
-      commentId: data.commentId,
-      userId: context.auth.uid,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-  };
+  const userId = context.auth.uid;
+  // Fetch the username
+  return admin.firestore().collection('users').doc(userId).get()
+      .then(doc => {
+          if (!doc.exists) {
+              throw new functions.https.HttpsError('not-found', 'User not found.');
+          }
+          const username = doc.data().username;
+          const reply = {
+              content: data.content,
+              commentId: data.commentId,
+              userId: userId,
+              username: username, // Include the username
+              createdAt: admin.firestore.FieldValue.serverTimestamp()
+          };
 
-  return db.collection('replies').add(reply);
+          return db.collection('replies').add(reply);
+      });
 });
+
 
 exports.getReplies = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
