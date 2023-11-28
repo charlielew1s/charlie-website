@@ -23,7 +23,7 @@ const Posts = ({ data }) => {
               <DeletePost postId={post.id} />
             </div>
           )}
-          <p>Posted by: {post.username}</p>
+          <Link to={`/user/${post.userID}`}>{post.username}</Link>
           <div><strong>{post.name}</strong></div>
           <div>{post.content}</div>
           {user && <CreateComment postId={post.id} />}

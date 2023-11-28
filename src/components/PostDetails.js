@@ -76,7 +76,7 @@ const PostDetails = () => {
     </ArrowBackIcon>
     </div>
     <div className={homestyles.homeContainer}>
-      <p>Posted by: {post.username}</p>
+      <Link to={`/user/${post.userID}`}>{post.username}</Link>
       <h2>{post.name}</h2>
       <p>{post.content}</p>
       {user && user.uid === post.userID && (
@@ -88,7 +88,7 @@ const PostDetails = () => {
       <CreateComment postId={postId}/>
       {comments.map(comment => (
         <div key={comment.id} className={poststyles.commentContainer}>
-          <p>Commented by: {comment.username}</p>
+          <Link to={`/user/${comment.userID}`}>{comment.username}</Link>
           <p>{comment.content}</p>
           {user && user.uid === comment.userID && (
             <>
@@ -99,7 +99,7 @@ const PostDetails = () => {
           <CreateReply commentId={comment.id} />
           {replies[comment.id] && replies[comment.id].map(reply => (
             <div key={reply.id} className={poststyles.replyContainer}>
-              <p>Replied by: {reply.username}</p>
+              <Link to={`/user/${reply.userId}`}>{reply.username}</Link>
               <p>{reply.content}</p>
               {user && user.uid === reply.userId && (
                 <>

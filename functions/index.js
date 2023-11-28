@@ -7,7 +7,7 @@ admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
 
-exports.getPosts = functions.https.g((req, res) => {
+exports.getPosts = functions.https.onRequest((req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     cors(req, res, async () => {
         try {
@@ -290,4 +290,34 @@ exports.deleteReply = functions.https.onCall((data, context) => {
   });
 });
 
+exports.getPostsByUser = functions.https.onCall(async (data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to get posts.');
+  }
+
+  const userId = data.userId;
+  if (!userId) {
+    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with one argument "userId".');
+  }
+
+  try {
+    const postsSnapshot = await db.collection('posts')
+                                  .where('userID', '==', userId)
+                                  .get();
+
+    const posts = [];
+    postsSnapshot.forEach(doc => {
+      posts.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    return { status: 'success', posts };
+  } catch (error) {
+    console.error('Error fetching user posts:', error);
+    throw new functions.https.HttpsError('unknown', 'Failed to fetch user posts', error);
+  }
+});
 

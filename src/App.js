@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
 import PostDetails from './components/PostDetails';
+import UserPosts from './components/UserPosts';
+
 
 function App() {
   const [userEmail, setUserEmail] = useState(null);
@@ -24,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
           <Route path="/post/:postId" element={<PostDetails />} />
+          <Route path="/user/:userId" element={<UserPosts />} />
         </Routes>
       </div>
     </Router>
