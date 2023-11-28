@@ -7,7 +7,7 @@ admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
 
-exports.getPosts = functions.https.onRequest((req, res) => {
+exports.getPosts = functions.https.g((req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     cors(req, res, async () => {
         try {

@@ -45,6 +45,7 @@ const CreateReply = ({ commentId }) => {
       .then((result) => {
         console.log(result);
         setReply('');
+        console.log('Closing modal now'); // Add this line
         handleClose();
       })
       .catch((error) => {

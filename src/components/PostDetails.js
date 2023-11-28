@@ -88,6 +88,7 @@ const PostDetails = () => {
       <CreateComment postId={postId}/>
       {comments.map(comment => (
         <div key={comment.id} className={poststyles.commentContainer}>
+          <p>Commented by: {comment.username}</p>
           <p>{comment.content}</p>
           {user && user.uid === comment.userID && (
             <>
@@ -98,6 +99,7 @@ const PostDetails = () => {
           <CreateReply commentId={comment.id} />
           {replies[comment.id] && replies[comment.id].map(reply => (
             <div key={reply.id} className={poststyles.replyContainer}>
+              <p>Replied by: {reply.username}</p>
               <p>{reply.content}</p>
               {user && user.uid === reply.userId && (
                 <>
