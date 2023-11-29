@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -9,14 +8,14 @@ import CreateReply from './CreateReply';
 import EditReply from './EditReply';
 import DeleteReply from './DeleteReply';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import homestyles from './Home.module.css'
-import poststyles from './Posts.module.css'
-import { Link, useNavigate } from 'react-router-dom'; // useNavigate for redirection
+import homestyles from './Home.module.css';
+import poststyles from './Posts.module.css';
+import { Link, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CreateComment from './CreateComment';
 import EditPost from './EditPost';
 import DeletePost from './DeletePost';
-
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -24,7 +23,8 @@ const PostDetails = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [replies, setReplies] = useState({});
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+  const functions = getFunctions();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -37,6 +37,25 @@ const PostDetails = () => {
     fetchPost();
     fetchComments();
   }, [postId]);
+
+
+  const handleFollowUnfollow = async (userIdToFollow, isFollowing) => {
+    if (!user) {
+      console.error("User is not authenticated");
+      return;
+    }
+
+    const functionName = isFollowing ? 'unfollowUser' : 'followUser';
+    const firebaseFunction = httpsCallable(functions, functionName);
+
+    try {
+      await firebaseFunction({ userId: userIdToFollow });
+      console.log(`${isFollowing ? 'Unfollowed' : 'Followed'} user:`, userIdToFollow);
+      // Optionally, trigger a UI update or state change here
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const fetchComments = async () => {
     const q = query(collection(firestore, 'comments'), where('postId', '==', postId));
@@ -76,6 +95,11 @@ const PostDetails = () => {
     </ArrowBackIcon>
     </div>
     <div className={homestyles.homeContainer}>
+    {user && user.uid !== post.userID && (
+                <button onClick={() => handleFollowUnfollow(post.userID, post.isFollowing)}>
+                  {post.isFollowing ? 'Unfollow' : 'Follow'}
+                </button>
+              )}
       <Link to={`/user/${post.userID}`}>{post.username}</Link>
       <h2>{post.name}</h2>
       <p>{post.content}</p>

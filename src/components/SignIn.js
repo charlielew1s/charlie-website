@@ -1,27 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { auth, provider } from "./config";
+import { auth, provider, firestore } from "./config"; // Import firestore
 import { signInWithPopup } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore"; // Import new firestore functions
 import Home from "./Home";
 import styles from './SignIn.module.css';
 import Posts from './Posts';
 import { getFunctions, httpsCallable } from "firebase/functions";
 import LoginIcon from '@mui/icons-material/Login';
 
-
-function SignIn({ onSignIn }) { // Ensure onSignIn is included here
+function SignIn({ onSignIn }) {
     const [userEmail, setUserEmail] = useState(null);
-
 
     const signIn = () => {
         signInWithPopup(auth, provider)
-            .then((data) => {
+            .then(async (data) => {
                 const email = data.user.email;
+                const uid = data.user.uid;
                 localStorage.setItem("email", email);
+                await ensureUserDocument(uid); // Ensure the user document is created
                 onSignIn(email); // Call the callback function
             })
             .catch((error) => {
                 console.error("Error during sign-in:", error);
             });
+    };
+
+    const ensureUserDocument = async (userId) => {
+        const userRef = doc(firestore, 'users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                username: '', // Placeholder, should be updated later
+                following: []
+            });
+        }
     };
 
     useEffect(() => {
@@ -48,6 +61,7 @@ function SignIn({ onSignIn }) { // Ensure onSignIn is included here
                 console.error("Error fetching posts:", error);
             });
     }
+
     return (
         <>
             <div className={styles.signInBanner}>RedditSimilar</div>

@@ -321,3 +321,70 @@ exports.getPostsByUser = functions.https.onCall(async (data, context) => {
   }
 });
 
+exports.followUser = functions.https.onCall((data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const userIdToFollow = data.userId;
+  const currentUserId = context.auth.uid;
+
+  return admin.firestore().collection('users').doc(currentUserId).update({
+    following: admin.firestore.FieldValue.arrayUnion(userIdToFollow)
+  });
+});
+
+exports.unfollowUser = functions.https.onCall((data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const userIdToUnfollow = data.userId;
+  const currentUserId = context.auth.uid;
+
+  // Remove the userId from the 'following' array
+  return admin.firestore().collection('users').doc(currentUserId).update({
+    following: admin.firestore.FieldValue.arrayRemove(userIdToUnfollow)
+  });
+});
+
+exports.getPersonalizedFeed = functions.https.onCall(async (data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const currentUserId = context.auth.uid;
+
+  try {
+    // Fetch the current user's following list
+    const userDoc = await admin.firestore().collection('users').doc(currentUserId).get();
+    if (!userDoc.exists) {
+      throw new functions.https.HttpsError('not-found', 'User not found.');
+    }
+
+    const following = userDoc.data().following || [];
+    
+    // Query for posts from followed users
+    const posts = [];
+    for (const userId of following) {
+      const postsSnapshot = await admin.firestore().collection('posts').where('userID', '==', userId).get();
+      postsSnapshot.forEach(doc => {
+        posts.push({ id: doc.id, ...doc.data() });
+      });
+    }
+
+    return { posts };
+  } catch (error) {
+    console.error('Error getting personalized feed:', error);
+    throw new functions.https.HttpsError('unknown', error.message, error);
+  }
+});
+
+exports.createUserDocument = functions.auth.user().onCreate((user) => {
+  return admin.firestore().collection('users').doc(user.uid).set({
+    username: '', // You might want to get the username differently, or prompt the user to set it later
+    following: []
+  });
+});
