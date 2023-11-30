@@ -3,15 +3,10 @@ import { useParams } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Posts from './Posts';
 import styles from './Home.module.css';
-import { Link, useNavigate } from 'react-router-dom'; // useNavigate for redirection
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
-
 
 const UserPosts = () => {
   const [userPosts, setUserPosts] = useState([]);
-  const { userId } = useParams(); // Get userId from route parameter
-  const navigate = useNavigate(); // Hook for navigation
+  const { userId } = useParams();
 
   useEffect(() => {
     const functions = getFunctions();
@@ -28,10 +23,7 @@ const UserPosts = () => {
 
   return (
     <>
-      <div className={styles.homeBanner}>
-      RedditSimilar
-      <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)}></ArrowBackIcon>
-    </div>
+      <div className={styles.homeBanner}>User's Posts</div>
       <div className={styles.homeContainer}>
         {userPosts.length > 0 ? (
           <Posts data={userPosts} />
@@ -39,7 +31,6 @@ const UserPosts = () => {
           <p>No posts available for this user.</p>
         )}
       </div>
-      {/* Any other content you want to include outside the homeContainer */}
     </>
   );
 };
