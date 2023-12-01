@@ -1,49 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from './config';
+import { auth, firestore } from './config'; // Added firestore import
+import { getDoc, doc } from 'firebase/firestore';
 import EditPost from './EditPost';
 import DeletePost from './DeletePost';
 import CreateComment from './CreateComment';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Posts.module.css';
 import CommentIcon from '@mui/icons-material/Comment';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { getFirestore, doc, getDoc } from 'firebase/firestore'; 
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
-  const [following, setFollowing] = useState([]); // Correct state for tracking following status
   const navigate = useNavigate();
   const functions = getFunctions();
-  const db = getFirestore();
+  const [following, setFollowing] = useState([]);
 
   useEffect(() => {
     const fetchFollowing = async () => {
       if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
         if (userDoc.exists()) {
           setFollowing(userDoc.data().following || []);
         }
       }
     };
-
     fetchFollowing();
   }, [user]);
 
-  const handleFollowUnfollow = async (userIdToFollow, isFollowing) => {
-    if (!user) {
-      console.error("User is not authenticated");
-      return;
-    }
-
-    const functionName = isFollowing ? 'unfollowUser' : 'followUser';
-    const firebaseFunction = httpsCallable(functions, functionName);
+  const handleVote = async (postId, isUpvote) => {
+    const functionName = isUpvote ? 'upvotePost' : 'downvotePost';
+    const voteFunction = httpsCallable(functions, functionName);
 
     try {
-      await firebaseFunction({ userId: userIdToFollow });
-      console.log(`${isFollowing ? 'Unfollowed' : 'Followed'} user:`, userIdToFollow);
-      setFollowing(prev => isFollowing ? prev.filter(id => id !== userIdToFollow) : [...prev, userIdToFollow]);
+      await voteFunction({ postId });
+      // Implement logic to refresh or update post data after voting
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleFollowUnfollow = async (userIdToFollow, isFollowing) => {
+    const functionName = isFollowing ? 'unfollowUser' : 'followUser';
+    const followFunction = httpsCallable(functions, functionName);
+
+    try {
+      await followFunction({ userId: userIdToFollow });
+      setFollowing((prevFollowing) => {
+        return isFollowing
+          ? prevFollowing.filter((id) => id !== userIdToFollow)
+          : [...prevFollowing, userIdToFollow];
+      });
     } catch (error) {
       console.error('Error:', error);
     }
@@ -51,19 +61,27 @@ const Posts = ({ data }) => {
 
   return (
     <div>
-      {data.map(post => (
+      {data.map((post) => (
         <div key={post.id} className={styles.postContainer}>
           <div className={styles.userAndFollow}>
             <Link to={`/user/${post.userID}`}>{post.username}</Link>
-            {''}
             {user && user.uid !== post.userID && (
-              <Button variant="outlined" size="small" onClick={() => handleFollowUnfollow(post.userID, following.includes(post.userID))}>
+              <Button 
+                variant="outlined" 
+                size="small" 
+                onClick={() => handleFollowUnfollow(post.userID, following.includes(post.userID))}
+              >
                 {following.includes(post.userID) ? 'Unfollow' : 'Follow'}
               </Button>
             )}
           </div>
           <div><strong>{post.name}</strong></div>
           <div>{post.content}</div>
+          <div className={styles.voteContainer}>
+            <ArrowUpwardIcon onClick={() => handleVote(post.id, true)} />
+            <span>{post.votes}</span>
+            <ArrowDownwardIcon onClick={() => handleVote(post.id, false)} />
+          </div>
           {user && user.uid === post.userID && (
             <div className={styles.buttonContainer}>
               <EditPost post={post} />
@@ -77,6 +95,5 @@ const Posts = ({ data }) => {
     </div>
   );
 };
-
 
 export default Posts;

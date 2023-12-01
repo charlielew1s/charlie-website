@@ -30,27 +30,29 @@ exports.getPosts = functions.https.onRequest((req, res) => {
 exports.createPost = functions.https.onCall((data, context) => {
   // Ensure the user is authenticated.
   if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
   const userId = context.auth.uid;
   // Fetch the username from your users collection based on userId
   return admin.firestore().collection('users').doc(userId).get()
-      .then(doc => {
-          if (!doc.exists) {
-              throw new functions.https.HttpsError('not-found', 'User not found.');
-          }
-          const username = doc.data().username;
-          const post = {
-              content: data.content,
-              name: data.name,
-              userID: userId,
-              username: username // Include the username here
-          };
+    .then(doc => {
+      if (!doc.exists) {
+        throw new functions.https.HttpsError('not-found', 'User not found.');
+      }
+      const username = doc.data().username;
+      const post = {
+        content: data.content,
+        name: data.name,
+        userID: userId,
+        username: username, // Include the username here
+        votes: 0 // Initialize votes to 0
+      };
 
-          return admin.firestore().collection('posts').add(post);
-      });
+      return admin.firestore().collection('posts').add(post);
+    });
 });
+
 
 
 exports.editPost = functions.https.onCall((data, context) => {
@@ -112,28 +114,30 @@ exports.editPost = functions.https.onCall((data, context) => {
 exports.createComment = functions.https.onCall((data, context) => {
   // Ensure the user is authenticated.
   if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
   const userId = context.auth.uid;
   // Fetch the username
   return admin.firestore().collection('users').doc(userId).get()
-      .then(doc => {
-          if (!doc.exists) {
-              throw new functions.https.HttpsError('not-found', 'User not found.');
-          }
-          const username = doc.data().username;
-          const comment = {
-              postId: data.postId,
-              content: data.content,
-              userID: userId,
-              username: username, // Include the username
-              createdAt: admin.firestore.FieldValue.serverTimestamp()
-          };
+    .then(doc => {
+      if (!doc.exists) {
+        throw new functions.https.HttpsError('not-found', 'User not found.');
+      }
+      const username = doc.data().username;
+      const comment = {
+        postId: data.postId,
+        content: data.content,
+        userID: userId,
+        username: username, // Include the username
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        votes: 0 // Initialize votes to 0
+      };
 
-          return db.collection('comments').add(comment);
-      });
+      return db.collection('comments').add(comment);
+    });
 });
+
 
 
 // Function to edit a comment
@@ -194,28 +198,30 @@ exports.deleteComment = functions.https.onCall(async (data, context) => {
 exports.createReply = functions.https.onCall((data, context) => {
   // Ensure the user is authenticated
   if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
   }
 
   const userId = context.auth.uid;
   // Fetch the username
   return admin.firestore().collection('users').doc(userId).get()
-      .then(doc => {
-          if (!doc.exists) {
-              throw new functions.https.HttpsError('not-found', 'User not found.');
-          }
-          const username = doc.data().username;
-          const reply = {
-              content: data.content,
-              commentId: data.commentId,
-              userId: userId,
-              username: username, // Include the username
-              createdAt: admin.firestore.FieldValue.serverTimestamp()
-          };
+    .then(doc => {
+      if (!doc.exists) {
+        throw new functions.https.HttpsError('not-found', 'User not found.');
+      }
+      const username = doc.data().username;
+      const reply = {
+        content: data.content,
+        commentId: data.commentId,
+        userId: userId,
+        username: username, // Include the username
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        votes: 0 // Initialize votes to 0
+      };
 
-          return db.collection('replies').add(reply);
-      });
+      return db.collection('replies').add(reply);
+    });
 });
+
 
 
 exports.getReplies = functions.https.onRequest((req, res) => {
@@ -386,5 +392,36 @@ exports.createUserDocument = functions.auth.user().onCreate((user) => {
   return admin.firestore().collection('users').doc(user.uid).set({
     username: '', // You might want to get the username differently, or prompt the user to set it later
     following: []
+  });
+});
+
+
+// Function to upvote a post, comment, or reply
+exports.upvote = functions.https.onCall((data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const { documentId, collection } = data; // 'collection' could be 'posts', 'comments', or 'replies'
+  const documentRef = db.collection(collection).doc(documentId);
+
+  return documentRef.update({
+    votes: admin.firestore.FieldValue.increment(1)
+  });
+});
+
+// Function to downvote a post, comment, or reply
+exports.downvote = functions.https.onCall((data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+
+  const { documentId, collection } = data; // 'collection' could be 'posts', 'comments', or 'replies'
+  const documentRef = db.collection(collection).doc(documentId);
+
+  return documentRef.update({
+    votes: admin.firestore.FieldValue.increment(-1)
   });
 });
