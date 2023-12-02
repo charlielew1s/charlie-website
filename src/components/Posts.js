@@ -12,12 +12,17 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Button from '@mui/material/Button';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const functions = getFunctions();
   const [following, setFollowing] = useState([]);
+  const db = getFirestore();
+  const [posts, setPosts] = useState([]);
+  
+
 
   useEffect(() => {
     const fetchFollowing = async () => {
@@ -31,13 +36,27 @@ const Posts = ({ data }) => {
     fetchFollowing();
   }, [user]);
 
-  const handleVote = async (postId, isUpvote) => {
-    const functionName = isUpvote ? 'upvotePost' : 'downvotePost';
-    const voteFunction = httpsCallable(functions, functionName);
 
+  const fetchPosts = async () => {
     try {
-      await voteFunction({ postId });
-      // Implement logic to refresh or update post data after voting
+      const querySnapshot = await getDocs(collection(db, 'posts'));
+      const postsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPosts(postsData);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const handleVote = async (postId, isUpvote) => {
+    const functionName = isUpvote ? 'upvote' : 'downvote';
+    const voteFunction = httpsCallable(functions, functionName);
+  
+    try {
+      await voteFunction({ documentId: postId, collection: 'posts' });
+      fetchPosts(); // Re-fetch posts after voting
     } catch (error) {
       console.error('Error:', error);
     }
