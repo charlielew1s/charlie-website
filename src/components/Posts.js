@@ -1,86 +1,115 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firestore } from './config';
+import { auth, firestore } from './config'; // Added firestore import
+import { getDoc, doc } from 'firebase/firestore';
 import EditPost from './EditPost';
 import DeletePost from './DeletePost';
 import CreateComment from './CreateComment';
-import EditComment from './EditComment';
-import DeleteComment from './DeleteComment';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { Link } from 'react-router-dom';
-import styles from './Posts.module.css'; // Import the CSS module here
+import { Link, useNavigate } from 'react-router-dom';
+import styles from './Posts.module.css';
 import CommentIcon from '@mui/icons-material/Comment';
-
-// Comment component placeholder
-const Comment = ({ comment, currentUser, isLastComment }) => (
-  <div className={isLastComment ? styles.lastCommentContainer : styles.commentContainer}>
-    <p>{comment.content}</p>
-    {currentUser && currentUser.uid === comment.userID && (
-      <div className={styles.buttonContainer}>
-        <EditComment comment={comment} />
-        <DeleteComment commentId={comment.id} />
-      </div>
-    )}
-  </div>
-);
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import Button from '@mui/material/Button';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
-  const [comments, setComments] = useState({});
-  const [showComments, setShowComments] = useState({});
+  const navigate = useNavigate();
+  const functions = getFunctions();
+  const [following, setFollowing] = useState([]);
+  const db = getFirestore();
+  const [posts, setPosts] = useState([]);
+  
 
-  const fetchComments = async (postId) => {
-    const q = query(collection(firestore, 'comments'), where('postId', '==', postId));
-    const commentsSnapshot = await getDocs(q);
-    const commentsForPost = [];
-    commentsSnapshot.forEach(doc => {
-      commentsForPost.push({ id: doc.id, ...doc.data() });
-    });
-    setComments(prevComments => ({ ...prevComments, [postId]: commentsForPost }));
-  };
 
   useEffect(() => {
-    data.forEach(post => {
-      fetchComments(post.id);
-    });
-  }, [data]);
+    const fetchFollowing = async () => {
+      if (user) {
+        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
+        if (userDoc.exists()) {
+          setFollowing(userDoc.data().following || []);
+        }
+      }
+    };
+    fetchFollowing();
+  }, [user]);
 
-  const toggleComments = (postId) => {
-    setShowComments(prevShowComments => ({ ...prevShowComments, [postId]: !prevShowComments[postId] }));
+
+  const fetchPosts = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'posts'));
+      const postsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPosts(postsData);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const handleVote = async (postId, isUpvote) => {
+    const functionName = isUpvote ? 'upvote' : 'downvote';
+    const voteFunction = httpsCallable(functions, functionName);
+  
+    try {
+      await voteFunction({ documentId: postId, collection: 'posts' });
+      fetchPosts(); // Re-fetch posts after voting
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleFollowUnfollow = async (userIdToFollow, isFollowing) => {
+    const functionName = isFollowing ? 'unfollowUser' : 'followUser';
+    const followFunction = httpsCallable(functions, functionName);
+
+    try {
+      await followFunction({ userId: userIdToFollow });
+      setFollowing((prevFollowing) => {
+        return isFollowing
+          ? prevFollowing.filter((id) => id !== userIdToFollow)
+          : [...prevFollowing, userIdToFollow];
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
     <div>
-      {data.map((post, index) => (
-        <React.Fragment key={post.id}>
-          <div className={styles.postContainer}>
-            {user && user.uid === post.userID && (
-              <div className={styles.buttonContainer}>
-                <EditPost post={post} />
-                <DeletePost postId={post.id} />
-              </div>
+      {data.map((post) => (
+        <div key={post.id} className={styles.postContainer}>
+          <div className={styles.userAndFollow}>
+            <Link to={`/user/${post.userID}`}>{post.username}</Link>
+            {user && user.uid !== post.userID && (
+              <Button 
+                variant="outlined" 
+                size="small" 
+                onClick={() => handleFollowUnfollow(post.userID, following.includes(post.userID))}
+              >
+                {following.includes(post.userID) ? 'Unfollow' : 'Follow'}
+              </Button>
             )}
-            <div><strong>{post.name}</strong></div>
-            <br></br>
-            <div>{post.content}</div>
-            <br></br>
-            {user && <CreateComment postId={post.id} />}
-            <Link to={`/post/${post.id}`}>
-                <CommentIcon></CommentIcon>
-            </Link>
-            {showComments[post.id] && <p className={styles.commentsLabel}>Comments:</p>}
           </div>
-          {showComments[post.id] && comments[post.id] && comments[post.id].map((comment, commentIndex, commentArray) => (
-            <Comment
-              key={comment.id}
-              comment={comment}
-              currentUser={user}
-              isLastComment={commentIndex === commentArray.length - 1}
-            />
-          ))}
-          {/* This div is used to add space after the last comment of each post */}
-          {data.length - 1 !== index && <div className={styles.spaceAfterComments}></div>}
-        </React.Fragment>
+          <div><strong>{post.name}</strong></div>
+          <div>{post.content}</div>
+          <div className={styles.voteContainer}>
+            <ArrowUpwardIcon onClick={() => handleVote(post.id, true)} />
+            <span>{post.votes}</span>
+            <ArrowDownwardIcon onClick={() => handleVote(post.id, false)} />
+          </div>
+          {user && user.uid === post.userID && (
+            <div className={styles.buttonContainer}>
+              <EditPost post={post} />
+              <DeletePost postId={post.id} />
+            </div>
+          )}
+          {user && <CreateComment postId={post.id} />}
+          <CommentIcon onClick={() => navigate(`/post/${post.id}`)} />
+        </div>
       ))}
     </div>
   );

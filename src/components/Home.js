@@ -6,9 +6,14 @@ import { signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { auth, provider } from './config';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { Button } from '@mui/material'; 
+import EditUsername from './EditUsername';
+import { useNavigate } from 'react-router-dom';
 
 function Home({ userEmail, onSignOut }) {
     const [postData, setPostData] = useState([]);
+    const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         callFirebaseFunction();
@@ -40,7 +45,14 @@ function Home({ userEmail, onSignOut }) {
 
     return (
         <>
-            <div className={styles.homeBanner}>RedditSimilar</div>
+            <div className={styles.homeBanner}>RedditSimilar
+            <Button onClick={() => navigate('/personalized-feed')}>Personalized Feed</Button>
+            <Button onClick={() => setIsEditUsernameOpen(true)}>Edit Username</Button>
+            <EditUsername 
+                open={isEditUsernameOpen} 
+                handleClose={() => setIsEditUsernameOpen(false)}
+            />
+            </div>
             <LogoutIcon className={styles.logoutButton} onClick={logout}>Logout</LogoutIcon>
 
             <div className={styles.homeContainer}>

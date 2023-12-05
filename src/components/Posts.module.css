@@ -1,42 +1,35 @@
 .postContainer {
-  border: 10px solid #c33dd0; /* Purple outline */
+  border: 1px solid #ddd;
   padding: 10px;
-  margin: 10px auto 0 auto; /* No bottom margin */
-  border-radius: 5px;
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
 }
 
 .commentContainer {
-  border: 10px solid #FFA500; /* Orange outline */
-  padding: 10px;
-  margin: 0 auto; /* No margin */
-  border-radius: 5px;
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
+  border-left: 3px solid #ccc;
+  margin-left: 10px;
+  padding-left: 10px;
+  margin-top: 10px;
 }
 
-/* This class adds space after the last comment */
-.lastCommentContainer {
-  border: 10px solid #FFA500; /* Orange outline */
-  padding: 10px;
-  margin: 0 auto 30px auto; /* Large bottom margin for the last comment */
-  border-radius: 5px;
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* This class adds space after the last comment if there are no comments */
-.spaceAfterComments {
-  margin-bottom: 100px; /* Large bottom margin after comments section */
+.replyContainer {
+  border-left: 3px solid #ccc; /* Light green border for replies */
+  margin-left: 10px;
+  padding-left: 10px;
+  margin-top: 10px;
+  background-color: #f4f4f4;
 }
 
 .buttonContainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 10px;
+  margin-top: 10px;
 }
+
+.commentsLabel {
+  font-weight: bold;
+}
+
+.spaceAfterComments {
+  margin-bottom: 50px;
+}
+
+/* Additional styles for buttons, icons, and other elements as needed */
