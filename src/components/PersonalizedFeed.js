@@ -38,6 +38,10 @@ const PersonalizedFeed = () => {
   }, [user]); // Ensure this useEffect runs whenever the user changes
 
   return (
+    <>
+    <div className={styles.homeBanner}>
+      RedditSimilar
+    </div>
     <div className={styles.homeContainer}>
       {personalizedPosts.length > 0 ? (
         <Posts data={personalizedPosts} following={following} />
@@ -45,6 +49,7 @@ const PersonalizedFeed = () => {
         <p>No personalized posts available.</p>
       )}
     </div>
+    </>
   );
 };
 

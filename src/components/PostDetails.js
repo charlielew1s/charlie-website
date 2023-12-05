@@ -91,8 +91,8 @@ const PostDetails = () => {
   return (
     <>
       <div className={homestyles.homeBanner}>
-        <ArrowBackIcon onClick={() => navigate(`/`)} />
-        RedditSimilar
+          <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)} />
+            RedditSimilar
       </div>
       <div className={homestyles.homeContainer}>
         {post && (
