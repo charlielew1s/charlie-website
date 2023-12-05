@@ -16,7 +16,7 @@ import DeletePost from './DeletePost';
 import Button from '@mui/material/Button';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Add this import
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 import homestyles from './Home.module.css';
 import poststyles from './Posts.module.css';
 

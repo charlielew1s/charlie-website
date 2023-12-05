@@ -5,11 +5,14 @@ import { auth, firestore } from './config';
 import { doc, getDoc } from 'firebase/firestore';
 import Posts from './Posts';
 import styles from './Home.module.css';
+import { Link, useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 
 const PersonalizedFeed = () => {
   const [personalizedPosts, setPersonalizedPosts] = useState([]);
   const [following, setFollowing] = useState([]);
   const [user] = useAuthState(auth);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFollowing = async () => {
@@ -40,7 +43,8 @@ const PersonalizedFeed = () => {
   return (
     <>
     <div className={styles.homeBanner}>
-      RedditSimilar
+          <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)} />
+            RedditSimilar
     </div>
     <div className={styles.homeContainer}>
       {personalizedPosts.length > 0 ? (

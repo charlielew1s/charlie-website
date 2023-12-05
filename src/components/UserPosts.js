@@ -3,10 +3,13 @@ import { useParams } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Posts from './Posts';
 import styles from './Home.module.css';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
+import { Link, useNavigate } from 'react-router-dom';
 
 const UserPosts = () => {
   const [userPosts, setUserPosts] = useState([]);
   const { userId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const functions = getFunctions();
@@ -23,7 +26,10 @@ const UserPosts = () => {
 
   return (
     <>
-      <div className={styles.homeBanner}>User's Posts</div>
+      <div className={styles.homeBanner}>
+          <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)} />
+            RedditSimilar
+      </div>
       <div className={styles.homeContainer}>
         {userPosts.length > 0 ? (
           <Posts data={userPosts} />
