@@ -21,8 +21,6 @@ const Posts = ({ data }) => {
   const [following, setFollowing] = useState([]);
   const db = getFirestore();
   const [posts, setPosts] = useState([]);
-  
-
 
   useEffect(() => {
     const fetchFollowing = async () => {

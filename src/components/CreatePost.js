@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useContext } from 'react'; // Import useContext here
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -9,6 +9,7 @@ import { getAuth } from 'firebase/auth'; // Import Firebase Authentication
 import { useAuthState } from 'react-firebase-hooks/auth'; // Import the hook
 import { getFunctions, httpsCallable } from 'firebase/functions'; // Import Firebase Functions
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { PostsContext } from './PostsContext'; 
 
 const style = {
   position: 'absolute',
@@ -26,6 +27,7 @@ export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
+  const { fetchPosts } = useContext(PostsContext);
 
   const auth = getAuth();
   const [user] = useAuthState(auth); // Get the currently authenticated user
@@ -33,7 +35,7 @@ export default function BasicModal() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Ensure there's a logged-in user
     if (!user) {
       console.error("User is not authenticated");
@@ -48,14 +50,11 @@ export default function BasicModal() {
 
     const functions = getFunctions();
     const createPost = httpsCallable(functions, 'createPost');
-    createPost(post)
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
+    const res = await createPost(post)
+    console.log(res);
+    if (res.data) {
+      setTimeout(fetchPosts, 5000);
+    }
     handleClose();
   };
 

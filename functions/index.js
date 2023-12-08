@@ -49,8 +49,14 @@ exports.createPost = functions.https.onCall((data, context) => {
         votes: 0 // Initialize votes to 0
       };
 
-      return admin.firestore().collection('posts').add(post);
-    });
+      try {
+        admin.firestore().collection('posts').add(post)
+      } catch (e) {
+        console.log('createPost error: ', e)
+        return { status: 'fail', message: 'Post not created' }
+      }
+      return { status: 'success', message: 'Post created successfully' }
+    })
 });
 
 

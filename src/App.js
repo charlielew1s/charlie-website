@@ -5,6 +5,7 @@ import Home from './components/Home';
 import PostDetails from './components/PostDetails';
 import UserPosts from './components/UserPosts';
 import PersonalizedFeed from './components/PersonalizedFeed';
+import { PostsProvider } from './components/PostsContext';
 
 
 function App() {
@@ -23,14 +24,16 @@ function App() {
 
   return (
     <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
-          <Route path="/post/:postId" element={<PostDetails />} />
-          <Route path="/user/:userId" element={<UserPosts />} />
-          <Route path="/personalized-feed" element={<PersonalizedFeed />} />
-        </Routes>
-      </div>
+      <PostsProvider> {/* Wrap the Routes with PostsProvider */}
+        <div>
+          <Routes>
+            <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
+            <Route path="/post/:postId" element={<PostDetails />} />
+            <Route path="/user/:userId" element={<UserPosts />} />
+            <Route path="/personalized-feed" element={<PersonalizedFeed />} />
+          </Routes>
+        </div>
+      </PostsProvider>
     </Router>
   );
 }
