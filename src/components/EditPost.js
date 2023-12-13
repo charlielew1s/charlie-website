@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
@@ -6,6 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, provider } from './config';
 import EditIcon from '@mui/icons-material/Edit';
 import PostDetails from './PostDetails';
+import { PostsContext } from './PostsContext'; // Import PostsContext
 
 const style = {
     position: 'absolute',
@@ -19,12 +20,13 @@ const style = {
     p: 4,
   };
 
-const EditPost = ({ post }) => {
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState(post.name);
-  const [content, setContent] = useState(post.content);
-  const auth = getAuth();
-  const [user] = useAuthState(auth);
+  const EditPost = ({ post }) => {
+    const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState(post.name);
+    const [content, setContent] = useState(post.content);
+    const { fetchPosts } = useContext(PostsContext); // Use PostsContext
+    const auth = getAuth();
+    const [user] = useAuthState(auth);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -46,6 +48,7 @@ const EditPost = ({ post }) => {
     editPost({ postId: post.id, ...updatedPost })
       .then((result) => {
         console.log(result);
+        fetchPosts(); // Call fetchPosts after successful update
       })
       .catch((error) => {
         console.error('Error:', error);

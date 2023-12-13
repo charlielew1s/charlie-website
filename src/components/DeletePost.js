@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // Import useContext
 import { Box, Button, Typography, Modal } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { PostsContext } from './PostsContext'; // Import PostsContext
 
 const style = {
     position: 'absolute',
@@ -17,10 +18,12 @@ const style = {
     p: 4,
   };
 
-const DeletePost = ({ postId }) => {
-  const [open, setOpen] = useState(false);
-  const auth = getAuth();
-  const [user] = useAuthState(auth);
+  const DeletePost = ({ postId }) => {
+    const [open, setOpen] = useState(false);
+    const { fetchPosts } = useContext(PostsContext); // Use PostsContext
+    const auth = getAuth();
+    const [user] = useAuthState(auth);
+  
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -36,6 +39,7 @@ const DeletePost = ({ postId }) => {
     deletePost({ postId: postId })
       .then((result) => {
         console.log(result);
+        fetchPosts(); // Call fetchPosts after successful deletion
       })
       .catch((error) => {
         console.error('Error:', error);
