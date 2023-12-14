@@ -403,31 +403,64 @@ exports.createUserDocument = functions.auth.user().onCreate((user) => {
 
 
 // Function to upvote a post, comment, or reply
-exports.upvote = functions.https.onCall((data, context) => {
-  // Ensure the user is authenticated
+exports.upvote = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
   }
 
-  const { documentId, collection } = data; // 'collection' could be 'posts', 'comments', or 'replies'
+  const { documentId, collection } = data;
+  const userId = context.auth.uid;
+  const voteDocId = `${userId}_${documentId}`;
+  const userVoteRef = db.collection('userVotes').doc(voteDocId);
   const documentRef = db.collection(collection).doc(documentId);
 
-  return documentRef.update({
-    votes: admin.firestore.FieldValue.increment(1)
-  });
+  const voteDoc = await userVoteRef.get();
+
+  if (!voteDoc.exists || voteDoc.data().voteStatus !== 'upvoted') {
+    // User is in neutral or has downvoted
+    const increment = voteDoc.exists && voteDoc.data().voteStatus === 'downvoted' ? 2 : 1;
+
+    await documentRef.update({
+      votes: admin.firestore.FieldValue.increment(increment)
+    });
+    await userVoteRef.set({
+      userId,
+      documentId,
+      voteStatus: 'upvoted',
+      documentType: collection
+    }, { merge: true });
+  }
+  // If user has already upvoted, no action is taken
 });
 
+
 // Function to downvote a post, comment, or reply
-exports.downvote = functions.https.onCall((data, context) => {
-  // Ensure the user is authenticated
+exports.downvote = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
   }
 
-  const { documentId, collection } = data; // 'collection' could be 'posts', 'comments', or 'replies'
+  const { documentId, collection } = data;
+  const userId = context.auth.uid;
+  const voteDocId = `${userId}_${documentId}`;
+  const userVoteRef = db.collection('userVotes').doc(voteDocId);
   const documentRef = db.collection(collection).doc(documentId);
 
-  return documentRef.update({
-    votes: admin.firestore.FieldValue.increment(-1)
-  });
+  const voteDoc = await userVoteRef.get();
+
+  if (!voteDoc.exists || voteDoc.data().voteStatus !== 'downvoted') {
+    // User is in neutral or has upvoted
+    const decrement = voteDoc.exists && voteDoc.data().voteStatus === 'upvoted' ? 2 : 1;
+
+    await documentRef.update({
+      votes: admin.firestore.FieldValue.increment(-decrement)
+    });
+    await userVoteRef.set({
+      userId,
+      documentId,
+      voteStatus: 'downvoted',
+      documentType: collection
+    }, { merge: true });
+  }
+  // If user has already downvoted, no action is taken
 });
