@@ -415,23 +415,20 @@ exports.upvote = functions.https.onCall(async (data, context) => {
   const documentRef = db.collection(collection).doc(documentId);
 
   const voteDoc = await userVoteRef.get();
+  const currentVoteStatus = voteDoc.exists ? voteDoc.data().voteStatus : 'neutral';
 
-  if (!voteDoc.exists || voteDoc.data().voteStatus !== 'upvoted') {
-    // User is in neutral or has downvoted
-    const increment = voteDoc.exists && voteDoc.data().voteStatus === 'downvoted' ? 2 : 1;
-
-    await documentRef.update({
-      votes: admin.firestore.FieldValue.increment(increment)
-    });
-    await userVoteRef.set({
-      userId,
-      documentId,
-      voteStatus: 'upvoted',
-      documentType: collection
-    }, { merge: true });
+  if (currentVoteStatus === 'downvoted') {
+    // Move from downvoted to neutral
+    await documentRef.update({ votes: admin.firestore.FieldValue.increment(1) });
+    await userVoteRef.set({ userId, documentId, voteStatus: 'neutral', documentType: collection }, { merge: true });
+  } else if (currentVoteStatus === 'neutral') {
+    // Move from neutral to upvoted
+    await documentRef.update({ votes: admin.firestore.FieldValue.increment(1) });
+    await userVoteRef.set({ userId, documentId, voteStatus: 'upvoted', documentType: collection }, { merge: true });
   }
-  // If user has already upvoted, no action is taken
+  // No action if already upvoted
 });
+
 
 
 // Function to downvote a post, comment, or reply
@@ -447,20 +444,22 @@ exports.downvote = functions.https.onCall(async (data, context) => {
   const documentRef = db.collection(collection).doc(documentId);
 
   const voteDoc = await userVoteRef.get();
+  const currentVoteStatus = voteDoc.exists ? voteDoc.data().voteStatus : 'neutral';
 
-  if (!voteDoc.exists || voteDoc.data().voteStatus !== 'downvoted') {
-    // User is in neutral or has upvoted
-    const decrement = voteDoc.exists && voteDoc.data().voteStatus === 'upvoted' ? 2 : 1;
-
-    await documentRef.update({
-      votes: admin.firestore.FieldValue.increment(-decrement)
-    });
-    await userVoteRef.set({
-      userId,
-      documentId,
-      voteStatus: 'downvoted',
-      documentType: collection
-    }, { merge: true });
+  if (currentVoteStatus === 'upvoted') {
+    // Move from upvoted to neutral
+    await documentRef.update({ votes: admin.firestore.FieldValue.increment(-1) });
+    await userVoteRef.set({ userId, documentId, voteStatus: 'neutral', documentType: collection }, { merge: true });
+  } else if (currentVoteStatus === 'neutral') {
+    // Move from neutral to downvoted
+    await documentRef.update({ votes: admin.firestore.FieldValue.increment(-1) });
+    await userVoteRef.set({ userId, documentId, voteStatus: 'downvoted', documentType: collection }, { merge: true });
   }
-  // If user has already downvoted, no action is taken
+  // No action if already downvoted
 });
+
+
+
+
+
+
