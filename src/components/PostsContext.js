@@ -5,7 +5,10 @@ import { firestore } from './config'; // Importing firestore instead of db
 export const PostsContext = createContext();
 
 export const PostsProvider = ({ children }) => {
-    const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [updateFlag, setUpdateFlag] = useState(false);
+
+  const toggleUpdateFlag = () => setUpdateFlag(flag => !flag);
 
     const fetchPosts = useCallback(async () => {
         try {
@@ -19,7 +22,7 @@ export const PostsProvider = ({ children }) => {
     
 
     return (
-        <PostsContext.Provider value={{ posts, fetchPosts }}>
+        <PostsContext.Provider value={{ posts, fetchPosts, updateFlag, toggleUpdateFlag }}>
             {children}
         </PostsContext.Provider>
     );

@@ -24,7 +24,7 @@ const style = {
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState(post.name);
     const [content, setContent] = useState(post.content);
-    const { fetchPosts } = useContext(PostsContext); // Use PostsContext
+    const { fetchPosts, toggleUpdateFlag } = useContext(PostsContext); // Use PostsContext
     const auth = getAuth();
     const [user] = useAuthState(auth);
 
@@ -46,13 +46,13 @@ const style = {
     const functions = getFunctions();
     const editPost = httpsCallable(functions, 'editPost');
     editPost({ postId: post.id, ...updatedPost })
-      .then((result) => {
-        console.log(result);
-        fetchPosts(); // Call fetchPosts after successful update
+      .then(() => {
+      fetchPosts();
+      toggleUpdateFlag(); // Toggle the flag after successful update
       })
       .catch((error) => {
-        console.error('Error:', error);
-      });
+      console.error('Error:', error);
+    });
 
     handleClose();
   };

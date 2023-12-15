@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getFirestore, getDoc, doc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -19,6 +19,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 import homestyles from './Home.module.css';
 import poststyles from './Posts.module.css';
+import { PostsContext } from './PostsContext';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -30,6 +31,8 @@ const PostDetails = () => {
   const db = getFirestore();
   const functions = getFunctions();
   const navigate = useNavigate();
+  const { fetchPosts, updateFlag } = useContext(PostsContext);
+
 
     const fetchPostDetails = async () => {
       try {
@@ -61,7 +64,7 @@ const PostDetails = () => {
 
     useEffect(() => {
       fetchPostDetails();
-    }, [postId]);
+    }, [postId,updateFlag]);
 
   // Function to check if the current user is following the author
   const checkIfFollowingAuthor = async (authorId) => {
@@ -99,6 +102,8 @@ const PostDetails = () => {
     }
   };
 
+
+
   return (
     <>
       <div className={homestyles.homeBanner}>
@@ -130,7 +135,7 @@ const PostDetails = () => {
               </div>
               {user && user.uid === post.userID && (
                 <div>
-                  <EditPost post={{ id: postId, ...post }} />
+                  <EditPost post={{ id: postId, ...post }} fetchPosts={fetchPosts} />
                   <DeletePost postId={postId} />
                 </div>
               )}
