@@ -20,8 +20,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import homestyles from './Home.module.css';
 import poststyles from './Posts.module.css';
 
-
-
 const PostDetails = () => {
   const { postId } = useParams();
   const [user] = useAuthState(auth);
@@ -33,33 +31,46 @@ const PostDetails = () => {
   const functions = getFunctions();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchPostDetails();
-  }, [postId]);
+    const fetchPostDetails = async () => {
+      try {
+        // Fetch post
+        const postDoc = await getDoc(doc(db, 'posts', postId));
+        if (postDoc.exists()) {
+          setPost({ id: postDoc.id, ...postDoc.data() });
+          // Check if following author
+          checkIfFollowingAuthor(postDoc.data().userID);
+        }
 
-  const fetchPostDetails = async () => {
-    try {
-      // Fetch post
-      const postDoc = await getDoc(doc(db, 'posts', postId));
-      if (postDoc.exists()) {
-        setPost({ id: postDoc.id, ...postDoc.data() });
+        // Fetch comments
+        const commentsSnapshot = await getDocs(query(collection(db, 'comments'), where('postId', '==', postId)));
+        const commentsData = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setComments(commentsData);
+
+        // Fetch replies
+        let repliesData = [];
+        for (const comment of commentsData) {
+          const repliesSnapshot = await getDocs(query(collection(db, 'replies'), where('commentId', '==', comment.id)));
+          const commentReplies = repliesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          repliesData = [...repliesData, ...commentReplies];
+        }
+        setReplies(repliesData);
+      } catch (error) {
+        console.error('Error fetching post details:', error);
       }
+    };
 
-      // Fetch comments
-      const commentsSnapshot = await getDocs(query(collection(db, 'comments'), where('postId', '==', postId)));
-      const commentsData = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setComments(commentsData);
+    useEffect(() => {
+      fetchPostDetails();
+    }, [postId]);
 
-      // Fetch replies
-      let repliesData = [];
-      for (const comment of commentsData) {
-        const repliesSnapshot = await getDocs(query(collection(db, 'replies'), where('commentId', '==', comment.id)));
-        const commentReplies = repliesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        repliesData = [...repliesData, ...commentReplies];
+  // Function to check if the current user is following the author
+  const checkIfFollowingAuthor = async (authorId) => {
+    if (user) {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const isFollowing = userDoc.data().following.includes(authorId);
+        setIsFollowingAuthor(isFollowing);
       }
-      setReplies(repliesData);
-    } catch (error) {
-      console.error('Error fetching post details:', error);
     }
   };
 
