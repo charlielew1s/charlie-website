@@ -6,7 +6,7 @@ import PostDetails from './components/PostDetails';
 import UserPosts from './components/UserPosts';
 import PersonalizedFeed from './components/PersonalizedFeed';
 import { PostsProvider } from './components/PostsContext';
-
+import { CommentsProvider } from './components/CommentsContext'; // Import CommentsProvider
 
 function App() {
   const [userEmail, setUserEmail] = useState(null);
@@ -24,15 +24,17 @@ function App() {
 
   return (
     <Router>
-      <PostsProvider> {/* Wrap the Routes with PostsProvider */}
-        <div>
-          <Routes>
-            <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
-            <Route path="/post/:postId" element={<PostDetails />} />
-            <Route path="/user/:userId" element={<UserPosts />} />
-            <Route path="/personalized-feed" element={<PersonalizedFeed />} />
-          </Routes>
-        </div>
+      <PostsProvider> {/* Keep PostsProvider at the top level */}
+        <CommentsProvider> {/* Wrap the Routes with CommentsProvider inside PostsProvider */}
+          <div>
+            <Routes>
+              <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
+              <Route path="/post/:postId" element={<PostDetails />} />
+              <Route path="/user/:userId" element={<UserPosts />} />
+              <Route path="/personalized-feed" element={<PersonalizedFeed />} />
+            </Routes>
+          </div>
+        </CommentsProvider>
       </PostsProvider>
     </Router>
   );

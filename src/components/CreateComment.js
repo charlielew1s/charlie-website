@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import AddCommentIcon from '@mui/icons-material/AddComment';
+import { CommentsContext } from './CommentsContext'; // Import the CommentsContext
 
 const style = {
   position: 'absolute',
@@ -26,6 +27,8 @@ const CreateComment = ({ postId }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const { fetchComments } = useContext(CommentsContext); // Access fetchComments from the context
+
   const handleSubmit = () => {
     if (!user) {
       console.error("User is not authenticated");
@@ -44,6 +47,7 @@ const CreateComment = ({ postId }) => {
       .then((result) => {
         console.log(result);
         setComment(''); // Clear the comment field after submission
+        fetchComments(postId); // Fetch updated comments
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -85,3 +89,5 @@ const CreateComment = ({ postId }) => {
 }
 
 export default CreateComment;
+
+

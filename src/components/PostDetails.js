@@ -19,54 +19,47 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 import homestyles from './Home.module.css';
 import poststyles from './Posts.module.css';
+import { CommentsContext } from './CommentsContext';
 import { PostsContext } from './PostsContext';
 
 const PostDetails = () => {
   const { postId } = useParams();
   const [user] = useAuthState(auth);
   const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
   const [replies, setReplies] = useState([]);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
   const db = getFirestore();
   const functions = getFunctions();
   const navigate = useNavigate();
   const { fetchPosts, updateFlag } = useContext(PostsContext);
+  const { comments, fetchComments } = useContext(CommentsContext);
 
-
-    const fetchPostDetails = async () => {
-      try {
-        // Fetch post
-        const postDoc = await getDoc(doc(db, 'posts', postId));
-        if (postDoc.exists()) {
-          setPost({ id: postDoc.id, ...postDoc.data() });
-          // Check if following author
-          checkIfFollowingAuthor(postDoc.data().userID);
-        }
-
-        // Fetch comments
-        const commentsSnapshot = await getDocs(query(collection(db, 'comments'), where('postId', '==', postId)));
-        const commentsData = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setComments(commentsData);
-
-        // Fetch replies
-        let repliesData = [];
-        for (const comment of commentsData) {
-          const repliesSnapshot = await getDocs(query(collection(db, 'replies'), where('commentId', '==', comment.id)));
-          const commentReplies = repliesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          repliesData = [...repliesData, ...commentReplies];
-        }
-        setReplies(repliesData);
-      } catch (error) {
-        console.error('Error fetching post details:', error);
+  const fetchPostDetails = async () => {
+    try {
+      const postDoc = await getDoc(doc(db, 'posts', postId));
+      if (postDoc.exists()) {
+        setPost({ id: postDoc.id, ...postDoc.data() });
+        checkIfFollowingAuthor(postDoc.data().userID);
       }
-    };
 
-    useEffect(() => {
-      fetchPostDetails();
-    }, [postId,updateFlag]);
+      fetchComments(postId);
 
-  // Function to check if the current user is following the author
+      let repliesData = [];
+      for (const comment of comments) {
+        const repliesSnapshot = await getDocs(query(collection(db, 'replies'), where('commentId', '==', comment.id)));
+        const commentReplies = repliesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        repliesData = [...repliesData, ...commentReplies];
+      }
+      setReplies(repliesData);
+    } catch (error) {
+      console.error('Error fetching post details:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPostDetails();
+  }, [postId, updateFlag, fetchPostDetails]); // Add fetchPostDetails as a dependency
+
   const checkIfFollowingAuthor = async (authorId) => {
     if (user) {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -76,6 +69,7 @@ const PostDetails = () => {
       }
     }
   };
+
 
   const handleVote = async (itemId, isUpvote, itemType) => {
     const functionName = isUpvote ? 'upvote' : 'downvote';
@@ -107,8 +101,8 @@ const PostDetails = () => {
   return (
     <>
       <div className={homestyles.homeBanner}>
-          <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)} />
-            RedditSimilar
+        <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)} />
+        RedditSimilar
       </div>
       <div className={homestyles.homeContainer}>
         {post && (
