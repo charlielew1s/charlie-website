@@ -7,6 +7,7 @@ import UserPosts from './components/UserPosts';
 import PersonalizedFeed from './components/PersonalizedFeed';
 import { PostsProvider } from './components/PostsContext';
 import { CommentsProvider } from './components/CommentsContext'; // Import CommentsProvider
+import { RepliesProvider } from './components/RepliesContext';
 
 function App() {
   const [userEmail, setUserEmail] = useState(null);
@@ -26,6 +27,7 @@ function App() {
     <Router>
       <PostsProvider> {/* Keep PostsProvider at the top level */}
         <CommentsProvider> {/* Wrap the Routes with CommentsProvider inside PostsProvider */}
+        <RepliesProvider>
           <div>
             <Routes>
               <Route path="/" element={userEmail ? <Home userEmail={userEmail} onSignOut={handleSignOut} /> : <SignIn onSignIn={setUserEmail} />} />
@@ -34,6 +36,7 @@ function App() {
               <Route path="/personalized-feed" element={<PersonalizedFeed />} />
             </Routes>
           </div>
+          </RepliesProvider>
         </CommentsProvider>
       </PostsProvider>
     </Router>
