@@ -4,7 +4,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import AddCommentIcon from '@mui/icons-material/AddComment';
-import { CommentsContext } from './CommentsContext'; // Import the CommentsContext
+import { AppContext } from './AppContext'; // Import AppContext
 
 const style = {
   position: 'absolute',
@@ -27,7 +27,7 @@ const CreateComment = ({ postId }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { fetchComments } = useContext(CommentsContext); // Access fetchComments from the context
+  const { fetchComments } = useContext(AppContext); // Use AppContext
 
   const handleSubmit = () => {
     if (!user) {
@@ -89,5 +89,6 @@ const CreateComment = ({ postId }) => {
 }
 
 export default CreateComment;
+
 
 

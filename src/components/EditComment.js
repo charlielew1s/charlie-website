@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import EditIcon from '@mui/icons-material/Edit';
+import { AppContext } from './AppContext'; // Import AppContext
 
 const style = {
   position: 'absolute',
@@ -81,3 +82,4 @@ const EditComment = ({ comment }) => {
 }
 
 export default EditComment;
+

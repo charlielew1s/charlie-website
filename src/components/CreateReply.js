@@ -4,8 +4,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import CommentIcon from '@mui/icons-material/Comment';
-import { RepliesContext } from './RepliesContext';
-
+import { AppContext } from './AppContext'; // Import RepliesContext
 
 const modalStyle = {
   position: 'absolute',
@@ -24,7 +23,7 @@ const CreateReply = ({ commentId }) => {
   const [reply, setReply] = useState('');
   const auth = getAuth();
   const [user] = useAuthState(auth);
-  const { fetchReplies } = useContext(RepliesContext);
+  const { fetchReplies } = useContext(AppContext);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -88,3 +87,4 @@ const CreateReply = ({ commentId }) => {
 };
 
 export default CreateReply;
+

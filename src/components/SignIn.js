@@ -48,11 +48,13 @@ function SignIn({ onSignIn }) {
 
     useEffect(() => {
         callFirebaseFunction();
+        console.log('here')
     }, []);
 
     const callFirebaseFunction = () => {
         const functions = getFunctions();
         const getPosts = httpsCallable(functions, 'getPosts');
+        console.log('calling getPosts')
         getPosts()
             .then((result) => {
                 setPostData(result.data || []);

@@ -12,16 +12,17 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Button from '@mui/material/Button';
-import { PostsContext } from './PostsContext';
+import { AppContext } from './AppContext'; // Import AppContext
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const functions = getFunctions();
   const db = firestore;
-  const { posts, fetchPosts } = useContext(PostsContext);
+  
+  // Use AppContext
+  const { posts, fetchPosts, toggleUpdateFlag, updateFlag } = useContext(AppContext);
   const [following, setFollowing] = useState([]);
-
   useEffect(() => {
     const fetchFollowing = async () => {
       if (user) {

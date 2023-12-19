@@ -3,30 +3,28 @@ import { Box, Button, Typography, Modal, TextField } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, provider } from './config';
 import EditIcon from '@mui/icons-material/Edit';
-import PostDetails from './PostDetails';
-import { PostsContext } from './PostsContext'; // Import PostsContext
+import { AppContext } from './AppContext'; // Import AppContext
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
-  const EditPost = ({ post }) => {
-    const [open, setOpen] = useState(false);
-    const [title, setTitle] = useState(post.name);
-    const [content, setContent] = useState(post.content);
-    const { fetchPosts, toggleUpdateFlag } = useContext(PostsContext); // Use PostsContext
-    const auth = getAuth();
-    const [user] = useAuthState(auth);
+const EditPost = ({ post }) => {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState(post.name);
+  const [content, setContent] = useState(post.content);
+  const { fetchPosts, toggleUpdateFlag } = useContext(AppContext); // Use AppContext
+  const auth = getAuth();
+  const [user] = useAuthState(auth);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -40,19 +38,19 @@ const style = {
     const updatedPost = {
       name: title,
       content: content,
-      userID: user.uid
+      userID: user.uid,
     };
 
     const functions = getFunctions();
     const editPost = httpsCallable(functions, 'editPost');
     editPost({ postId: post.id, ...updatedPost })
       .then(() => {
-      fetchPosts();
-      toggleUpdateFlag(); // Toggle the flag after successful update
+        fetchPosts();
+        toggleUpdateFlag(); // Toggle the flag after successful update
       })
       .catch((error) => {
-      console.error('Error:', error);
-    });
+        console.error('Error:', error);
+      });
 
     handleClose();
   };

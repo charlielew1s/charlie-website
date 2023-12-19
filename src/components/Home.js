@@ -9,12 +9,14 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { Button } from '@mui/material'; 
 import EditUsername from './EditUsername';
 import { useNavigate } from 'react-router-dom';
-import { PostsContext } from './PostsContext';
+import { AppContext } from './AppContext'; // Import AppContext
 
 function Home({ userEmail, onSignOut }) {
-    const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
-    const navigate = useNavigate();
-    const {posts, fetchPosts} = useContext(PostsContext)
+  const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  // Use AppContext
+  const { posts, fetchPosts } = useContext(AppContext);
 
     useEffect(() => {
         console.log('Component re-rendered with posts:', posts);

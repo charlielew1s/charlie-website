@@ -17,6 +17,7 @@ const UserPosts = () => {
 
     getPostsByUser({ userId })
       .then((result) => {
+        console.log('userId, ', userId)
         setUserPosts(result.data.posts);
       })
       .catch((error) => {

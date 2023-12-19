@@ -19,8 +19,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 import homestyles from './Home.module.css';
 import poststyles from './Posts.module.css';
-import { CommentsContext } from './CommentsContext';
-import { PostsContext } from './PostsContext';
+import { AppContext } from './AppContext'; // Import AppContext
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -31,8 +30,10 @@ const PostDetails = () => {
   const db = getFirestore();
   const functions = getFunctions();
   const navigate = useNavigate();
-  const { fetchPosts, updateFlag } = useContext(PostsContext);
-  const { comments, fetchComments } = useContext(CommentsContext);
+  
+  // Use AppContext
+  const { fetchPosts, updateFlag } = useContext(AppContext);
+  const { comments, fetchComments } = useContext(AppContext);
 
   const fetchPostDetails = async () => {
     try {

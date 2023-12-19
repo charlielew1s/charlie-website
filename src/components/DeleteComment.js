@@ -4,7 +4,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CommentsContext } from './CommentsContext'; // Import CommentsContext
+import { AppContext } from './AppContext'; // Import AppContext
 
 const DeleteComment = ({ commentId, postId }) => {
     const auth = getAuth();
@@ -12,7 +12,7 @@ const DeleteComment = ({ commentId, postId }) => {
     const [open, setOpen] = React.useState(false);
 
     // Use the context
-    const { fetchComments } = useContext(CommentsContext);
+    const { fetchComments } = useContext(AppContext);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -67,3 +67,4 @@ const DeleteComment = ({ commentId, postId }) => {
 }
 
 export default DeleteComment;
+
