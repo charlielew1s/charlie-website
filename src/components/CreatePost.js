@@ -1,14 +1,15 @@
-import * as React from 'react';
+import React, { useState, useContext } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import styles from './CreatePost.module.css';
-import { getAuth } from 'firebase/auth'; // Import Firebase Authentication
-import { useAuthState } from 'react-firebase-hooks/auth'; // Import the hook
-import { getFunctions, httpsCallable } from 'firebase/functions'; // Import Firebase Functions
+import { getAuth } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { AppContext } from './AppContext'; // Import AppContext
 
 const style = {
   position: 'absolute',
@@ -26,15 +27,15 @@ export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
+  const { fetchPosts } = useContext(AppContext); // Use AppContext instead of PostsContext
 
   const auth = getAuth();
-  const [user] = useAuthState(auth); // Get the currently authenticated user
+  const [user] = useAuthState(auth);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = () => {
-    // Ensure there's a logged-in user
+  const handleSubmit = async () => {
     if (!user) {
       console.error("User is not authenticated");
       return;
@@ -43,27 +44,24 @@ export default function BasicModal() {
     const post = {
       name: title,
       content: content,
-      userID: user.uid // Get the user's UID
+      userID: user.uid,
     };
 
     const functions = getFunctions();
     const createPost = httpsCallable(functions, 'createPost');
-    createPost(post)
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
+    const res = await createPost(post);
+    console.log(res);
+    if (res.data) {
+      setTimeout(fetchPosts, 5000);
+    }
     handleClose();
   };
 
   return (
     <div>
-        <div className={styles.modal_button}>
-            <AddCircleIcon onClick={handleOpen}></AddCircleIcon>
-        </div>
+      <div className={styles.modal_button}>
+        <AddCircleIcon onClick={handleOpen}></AddCircleIcon>
+      </div>
       <Modal
         open={open}
         onClose={handleClose}

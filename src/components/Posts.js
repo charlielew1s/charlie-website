@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firestore } from './config'; // Added firestore import
 import { getDoc, doc } from 'firebase/firestore';
@@ -12,18 +12,17 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Button from '@mui/material/Button';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { AppContext } from './AppContext'; // Import AppContext
 
 const Posts = ({ data }) => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const functions = getFunctions();
-  const [following, setFollowing] = useState([]);
-  const db = getFirestore();
-  const [posts, setPosts] = useState([]);
+  const db = firestore;
   
-
-
+  // Use AppContext
+  const { posts, fetchPosts, toggleUpdateFlag, updateFlag } = useContext(AppContext);
+  const [following, setFollowing] = useState([]);
   useEffect(() => {
     const fetchFollowing = async () => {
       if (user) {
@@ -36,27 +35,13 @@ const Posts = ({ data }) => {
     fetchFollowing();
   }, [user]);
 
-
-  const fetchPosts = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'posts'));
-      const postsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPosts(postsData);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
   const handleVote = async (postId, isUpvote) => {
     const functionName = isUpvote ? 'upvote' : 'downvote';
     const voteFunction = httpsCallable(functions, functionName);
   
     try {
       await voteFunction({ documentId: postId, collection: 'posts' });
-      fetchPosts(); // Re-fetch posts after voting
+      fetchPosts(); // Re-fetch posts using context method
     } catch (error) {
       console.error('Error:', error);
     }
@@ -116,3 +101,4 @@ const Posts = ({ data }) => {
 };
 
 export default Posts;
+

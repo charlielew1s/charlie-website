@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from './Home.module.css';
 import Posts from './Posts';
 import CreatePost from './CreatePost'; 
@@ -9,28 +9,22 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { Button } from '@mui/material'; 
 import EditUsername from './EditUsername';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from './AppContext'; // Import AppContext
 
 function Home({ userEmail, onSignOut }) {
-    const [postData, setPostData] = useState([]);
-    const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
-    const navigate = useNavigate();
+  const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  // Use AppContext
+  const { posts, fetchPosts } = useContext(AppContext);
 
     useEffect(() => {
-        callFirebaseFunction();
-    }, []);
+        console.log('Component re-rendered with posts:', posts);
+      }, [posts]);
 
-    const callFirebaseFunction = () => {
-        const functions = getFunctions();
-        const getPosts = httpsCallable(functions, 'getPosts');
-        getPosts()
-            .then((result) => {
-                setPostData(result.data || []);
-            })
-            .catch((error) => {
-                console.error("Error fetching posts:", error);
-            });
-    }
-
+    useEffect(()=> {
+        fetchPosts();
+    }, [fetchPosts]);
     
     const logout = () => {
         signOut(auth).then(() => {
@@ -59,8 +53,8 @@ function Home({ userEmail, onSignOut }) {
                 {/* Render the CreatePost component */}
                 <CreatePost />
 
-                {postData.length > 0 ? (
-                    <Posts data={postData} />
+                {posts.length > 0 ? (
+                    <Posts data={posts} />
                 ) : (
                     <p>No posts available.</p>
                 )}

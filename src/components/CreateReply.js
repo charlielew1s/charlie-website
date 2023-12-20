@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import CommentIcon from '@mui/icons-material/Comment';
-
+import { AppContext } from './AppContext'; // Import RepliesContext
 
 const modalStyle = {
   position: 'absolute',
@@ -23,6 +23,7 @@ const CreateReply = ({ commentId }) => {
   const [reply, setReply] = useState('');
   const auth = getAuth();
   const [user] = useAuthState(auth);
+  const { fetchReplies } = useContext(AppContext);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -42,16 +43,16 @@ const CreateReply = ({ commentId }) => {
     const functions = getFunctions();
     const createReply = httpsCallable(functions, 'createReply');
     createReply(newReply)
-      .then((result) => {
-        console.log(result);
-        setReply('');
-        console.log('Closing modal now'); // Add this line
+            .then((result) => {
+                console.log(result);
+                setReply('');
+                fetchReplies(commentId); // Fetch updated replies
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         handleClose();
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  };
+    };
 
   return (
     <div>
@@ -86,3 +87,4 @@ const CreateReply = ({ commentId }) => {
 };
 
 export default CreateReply;
+

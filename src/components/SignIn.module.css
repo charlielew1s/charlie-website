@@ -5,33 +5,45 @@ body, html {
 }
 
 .mainLayout {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 48px); /* Adjusting height to account for banner */
-    padding: 10px;
-    width: 100vw; /* Ensures it takes the full viewport width */
-    box-sizing: border-box; /* Ensures padding doesn't add to the width */
-}
-
-.signInBanner {
-    background-color: #d43c1a; /* Green */
-    color: white;
-    text-align: center;
-    padding: 14px 20px;
-    font-weight: bold;
+    /* Removed flex display to avoid vertical stretching */
+    padding: 0; /* Removed padding that might cause gaps */
+    margin: 0 auto; /* Center the layout without adding vertical space */
     width: 100%;
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 }
 
 .signInContainer {
-    max-width: 660px; /* Adjust width as needed */
-    margin: auto; /* Centers the container */
-    padding: 10px;
-    background-color: white; /* Sets the background of the container */
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
-    border-radius: 4px; /* Optional for rounded corners */
+    max-width: 660px;
+    margin: 0 auto; /* Remove top margin to ensure it sits directly below the banner */
+    padding: 10px; /* Padding inside the container */
+    background-color: white;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    /* If there is still a gap, make sure padding-top of the first child inside the container is 0 */
 }
+
+
+
+
+.signInBanner {
+    background-color: #d43c1a; /* Adjusted color */
+    color: white;
+    text-align: center;
+    padding: 14px 20px; /* Ensure padding matches homeBanner exactly */
+    font-weight: bold;
+    width: 100%;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0; /* Ensure there's no margin pushing the container down */
+}
+
+.mainLayout {
+    padding: 0; /* Remove padding if it's pushing content away from the banner */
+    margin: 0 auto; /* Center the layout without adding vertical space */
+    width: 100%;
+    box-sizing: border-box;
+    /* Remove height adjustment if it's not necessary */
+}
+
 
 .signInButton {
     position: absolute;

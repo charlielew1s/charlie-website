@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getFirestore, getDoc, doc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -19,40 +19,34 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 import homestyles from './Home.module.css';
 import poststyles from './Posts.module.css';
-
-
+import { AppContext } from './AppContext'; // Import AppContext
 
 const PostDetails = () => {
   const { postId } = useParams();
   const [user] = useAuthState(auth);
   const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
   const [replies, setReplies] = useState([]);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
   const db = getFirestore();
   const functions = getFunctions();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchPostDetails();
-  }, [postId]);
+  
+  // Use AppContext
+  const { fetchPosts, updateFlag } = useContext(AppContext);
+  const { comments, fetchComments } = useContext(AppContext);
 
   const fetchPostDetails = async () => {
     try {
-      // Fetch post
       const postDoc = await getDoc(doc(db, 'posts', postId));
       if (postDoc.exists()) {
         setPost({ id: postDoc.id, ...postDoc.data() });
+        checkIfFollowingAuthor(postDoc.data().userID);
       }
 
-      // Fetch comments
-      const commentsSnapshot = await getDocs(query(collection(db, 'comments'), where('postId', '==', postId)));
-      const commentsData = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setComments(commentsData);
+      fetchComments(postId);
 
-      // Fetch replies
       let repliesData = [];
-      for (const comment of commentsData) {
+      for (const comment of comments) {
         const repliesSnapshot = await getDocs(query(collection(db, 'replies'), where('commentId', '==', comment.id)));
         const commentReplies = repliesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         repliesData = [...repliesData, ...commentReplies];
@@ -62,6 +56,21 @@ const PostDetails = () => {
       console.error('Error fetching post details:', error);
     }
   };
+
+  useEffect(() => {
+    fetchPostDetails();
+  }, [postId, updateFlag, fetchPostDetails]); // Add fetchPostDetails as a dependency
+
+  const checkIfFollowingAuthor = async (authorId) => {
+    if (user) {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const isFollowing = userDoc.data().following.includes(authorId);
+        setIsFollowingAuthor(isFollowing);
+      }
+    }
+  };
+
 
   const handleVote = async (itemId, isUpvote, itemType) => {
     const functionName = isUpvote ? 'upvote' : 'downvote';
@@ -88,11 +97,13 @@ const PostDetails = () => {
     }
   };
 
+
+
   return (
     <>
       <div className={homestyles.homeBanner}>
-          <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)} />
-            RedditSimilar
+        <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)} />
+        RedditSimilar
       </div>
       <div className={homestyles.homeContainer}>
         {post && (
@@ -119,7 +130,7 @@ const PostDetails = () => {
               </div>
               {user && user.uid === post.userID && (
                 <div>
-                  <EditPost post={{ id: postId, ...post }} />
+                  <EditPost post={{ id: postId, ...post }} fetchPosts={fetchPosts} />
                   <DeletePost postId={postId} />
                 </div>
               )}
