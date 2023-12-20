@@ -458,6 +458,55 @@ exports.downvote = functions.https.onCall(async (data, context) => {
   // No action if already downvoted
 });
 
+exports.updateUsernames = functions.firestore
+    .document('users/{userId}')
+    .onUpdate(async (change, context) => {
+        const newValue = change.after.data();
+        const oldValue = change.before.data();
+
+        if (newValue.username === oldValue.username) {
+            // If the username hasn't changed, do nothing
+            return null;
+        }
+
+        const userId = context.params.userId;
+        const newUsername = newValue.username;
+
+        // Call a function to update usernames in related documents
+        await updateRelatedDocuments(userId, newUsername);
+        
+        return null;
+    });
+
+
+    async function updateRelatedDocuments(userId, newUsername) {
+      const db = admin.firestore();
+  
+      // Update posts
+      const postsRef = db.collection('posts').where('userID', '==', userId);
+      const postsSnapshot = await postsRef.get();
+      postsSnapshot.forEach(doc => {
+          doc.ref.update({ username: newUsername });
+      });
+  
+      // Update comments
+      const commentsRef = db.collection('comments').where('userID', '==', userId);
+      const commentsSnapshot = await commentsRef.get();
+      commentsSnapshot.forEach(doc => {
+          doc.ref.update({ username: newUsername });
+      });
+  
+      // Update replies
+      const repliesRef = db.collection('replies').where('userId', '==', userId);
+      const repliesSnapshot = await repliesRef.get();
+      repliesSnapshot.forEach(doc => {
+          doc.ref.update({ username: newUsername });
+      });
+  }
+  
+  
+
+
 
 
 
