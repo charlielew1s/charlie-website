@@ -16,7 +16,7 @@ function Home({ userEmail, onSignOut }) {
   const navigate = useNavigate();
   
   // Use AppContext
-  const { posts, fetchPosts } = useContext(AppContext);
+  const { posts, fetchPosts, updateFlag } = useContext(AppContext);
 
     useEffect(() => {
         console.log('Component re-rendered with posts:', posts);
@@ -24,7 +24,7 @@ function Home({ userEmail, onSignOut }) {
 
     useEffect(()=> {
         fetchPosts();
-    }, [fetchPosts]);
+    }, [fetchPosts, updateFlag]);
     
     const logout = () => {
         signOut(auth).then(() => {
