@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'; // Import getDoc here
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { firestore } from './config';
+import { AppContext } from './AppContext';
 
 const modalStyle = {
     position: 'absolute',
@@ -19,6 +20,7 @@ const modalStyle = {
 const EditUsername = ({ open, handleClose }) => {
     const [newUsername, setNewUsername] = useState('');
     const auth = getAuth();
+    const { fetchPosts } = useContext(AppContext);
 
     const handleUpdate = async () => {
         if (!auth.currentUser) {
@@ -36,7 +38,12 @@ const EditUsername = ({ open, handleClose }) => {
             // Update the document if it exists
             await updateDoc(userRef, { username: newUsername });
         }
-    
+
+        // Introduce a delay before fetching posts
+        setTimeout(() => {
+            fetchPosts();
+        }, 5000);
+
         handleClose();
     };
     
@@ -64,3 +71,4 @@ const EditUsername = ({ open, handleClose }) => {
 };
 
 export default EditUsername;
+
