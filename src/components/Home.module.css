@@ -6,8 +6,8 @@ body, html {
 
 
 .homeBanner {
-    background-color: #ea2121; /* Example: Different color, blue */
-    color: white;
+    background-color: white; /* Example: Different color, blue */
+    color: orange;
     text-align: center;
     padding: 14px 20px;
     font-weight: bold;

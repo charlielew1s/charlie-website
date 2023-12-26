@@ -43,9 +43,9 @@ const PersonalizedFeed = () => {
   return (
     <>
     <div className={styles.homeBanner}>
-          <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)} />
             RedditSimilar
     </div>
+    <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)} />
     <div className={styles.homeContainer}>
       {personalizedPosts.length > 0 ? (
         <Posts data={personalizedPosts} following={following} />
