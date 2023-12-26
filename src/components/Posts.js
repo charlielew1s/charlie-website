@@ -64,7 +64,7 @@ const Posts = ({ data }) => {
   };
 
   return (
-    <div>
+    <>
       {data.map((post) => (
         <div key={post.id} className={styles.postContainer}>
           <div className={styles.userAndFollow}>
@@ -86,17 +86,19 @@ const Posts = ({ data }) => {
             <span>{post.votes}</span>
             <ArrowDownwardIcon onClick={() => handleVote(post.id, false)} />
           </div>
-          {user && user.uid === post.userID && (
-            <div className={styles.buttonContainer}>
-              <EditPost post={post} />
-              <DeletePost postId={post.id} />
-            </div>
-          )}
-          {user && <CreateComment postId={post.id} />}
-          <CommentIcon onClick={() => navigate(`/post/${post.id}`)} />
+          <div className={styles.buttonContainer}>
+            {user && user.uid === post.userID && (
+              <>
+                <EditPost post={post} />
+                <DeletePost postId={post.id} />
+              </>
+            )}
+            {user && <CreateComment postId={post.id} />}
+            <CommentIcon onClick={() => navigate(`/post/${post.id}`)} />
+          </div>
         </div>
       ))}
-    </div>
+    </>
   );
 };
 
