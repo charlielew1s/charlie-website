@@ -129,13 +129,13 @@ const PostDetails = () => {
                 <ArrowDownwardIcon onClick={() => handleVote(post.id, false, 'post')} />
               </div>
               {user && user.uid === post.userID && (
-                <div>
-                  <EditPost post={{ id: postId, ...post }} fetchPosts={fetchPosts} />
-                  <DeletePost postId={postId} />
-                </div>
-              )}
+              <div className={poststyles.buttonContainer}>
+                <EditPost post={{ id: postId, ...post }} fetchPosts={fetchPosts} />
+                <DeletePost postId={postId} />
+                <CreateComment postId={postId} />
+              </div>
+            )}          
             </div>
-            <CreateComment postId={postId} />
             {comments.map(comment => (
               <div key={comment.id} className={poststyles.commentContainer}>
                 <Link to={`/user/${comment.userID}`}>{comment.username}</Link>
