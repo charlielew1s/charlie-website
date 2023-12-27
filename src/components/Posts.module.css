@@ -41,3 +41,8 @@
 }
 
 /* Additional styles for buttons, icons, and other elements as needed */
+.userAndFollow {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adding a gap of 10px between elements */
+}
