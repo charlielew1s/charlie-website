@@ -146,12 +146,12 @@ const PostDetails = () => {
                   <ArrowDownwardIcon onClick={() => handleVote(comment.id, false, 'comment')} />
                 </div>
                 {user && user.uid === comment.userID && (
-                  <>
-                    <EditComment comment={comment} />
-                    <DeleteComment commentId={comment.id} />
-                  </>
+                  <div className={poststyles.buttonContainer}>
+                  <EditComment comment={comment} />
+                  <DeleteComment commentId={comment.id} />
+                  <CreateReply commentId={comment.id} />
+                </div>
                 )}
-                <CreateReply commentId={comment.id} />
                 {replies.filter(reply => reply.commentId === comment.id).map(reply => (
                   <div key={reply.id} className={poststyles.replyContainer}>
                     <p>{reply.content}</p>
@@ -161,10 +161,10 @@ const PostDetails = () => {
                       <ArrowDownwardIcon onClick={() => handleVote(reply.id, false, 'reply')} />
                     </div>
                     {user && user.uid === reply.userId && (
-                      <>
+                      <div className={poststyles.buttonContainer}>
                         <EditReply reply={reply} />
                         <DeleteReply replyId={reply.id} />
-                      </>
+                      </div>
                     )}
                   </div>
                 ))}
