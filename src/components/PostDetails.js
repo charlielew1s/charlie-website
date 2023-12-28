@@ -154,6 +154,7 @@ const PostDetails = () => {
                 )}
                 {replies.filter(reply => reply.commentId === comment.id).map(reply => (
                   <div key={reply.id} className={poststyles.replyContainer}>
+                    <Link to={`/user/${reply.userId}`}>{reply.username}</Link>
                     <p>{reply.content}</p>
                     <div className={poststyles.voteContainer}>
                       <ArrowUpwardIcon onClick={() => handleVote(reply.id, true, 'reply')} />
