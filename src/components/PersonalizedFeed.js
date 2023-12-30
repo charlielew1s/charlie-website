@@ -5,14 +5,35 @@ import { auth, firestore } from './config';
 import { doc, getDoc } from 'firebase/firestore';
 import Posts from './Posts';
 import styles from './Home.module.css';
-import { Link, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate here
+
 
 const PersonalizedFeed = () => {
   const [personalizedPosts, setPersonalizedPosts] = useState([]);
   const [following, setFollowing] = useState([]);
   const [user] = useAuthState(auth);
+  const [username, setUsername] = useState(''); // State for username
   const navigate = useNavigate();
+
+  // Function to fetch username from Firestore
+  const fetchUsername = async () => {
+    if (user) {
+      const userRef = doc(firestore, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUsername(userSnap.data().username);
+      } else {
+        console.log("No such document!");
+      }
+    } else {
+      setUsername(''); // Clear username if no user is logged in
+    }
+  };
+
+  useEffect(() => {
+    fetchUsername();
+  }, [user]);
 
   useEffect(() => {
     const fetchFollowing = async () => {
@@ -42,19 +63,23 @@ const PersonalizedFeed = () => {
 
   return (
     <>
-    <div className={styles.homeBanner}>
-            RedditSimilar
-    </div>
-    <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)} />
-    <div className={styles.homeContainer}>
-      {personalizedPosts.length > 0 ? (
-        <Posts data={personalizedPosts} following={following} />
-      ) : (
-        <p>No personalized posts available.</p>
-      )}
-    </div>
+      <div className={styles.homeBanner}>
+        RedditSimilar
+        <span className={styles.authenticatedUser}>
+          {username ? <span>Hello, {username}</span> : null} {/* Display the app-specific username */}
+        </span>
+      </div>
+      <ArrowBackIcon className={styles.createPostButton} onClick={() => navigate(`/`)} />
+      <div className={styles.homeContainer}>
+        {personalizedPosts.length > 0 ? (
+          <Posts data={personalizedPosts} following={following} />
+        ) : (
+          <p>No personalized posts available.</p>
+        )}
+      </div>
     </>
   );
 };
 
 export default PersonalizedFeed;
+

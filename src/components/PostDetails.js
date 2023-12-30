@@ -24,6 +24,7 @@ import { AppContext } from './AppContext'; // Import AppContext
 const PostDetails = () => {
   const { postId } = useParams();
   const [user] = useAuthState(auth);
+  const [username, setUsername] = useState(''); // State for username
   const [post, setPost] = useState(null);
   const [replies, setReplies] = useState([]);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
@@ -34,6 +35,24 @@ const PostDetails = () => {
   // Use AppContext
   const { fetchPosts, updateFlag } = useContext(AppContext);
   const { comments, fetchComments } = useContext(AppContext);
+
+  const fetchUsername = async () => {
+    if (user) {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUsername(userSnap.data().username);
+      } else {
+        console.log("No such document!");
+      }
+    } else {
+      setUsername(''); // Clear username if no user is logged in
+    }
+  };
+
+  useEffect(() => {
+    fetchUsername();
+  }, [user]);
 
   const fetchPostDetails = async () => {
     try {
@@ -59,7 +78,7 @@ const PostDetails = () => {
 
   useEffect(() => {
     fetchPostDetails();
-  }, [postId, updateFlag, fetchPostDetails]); // Add fetchPostDetails as a dependency
+  }, [postId, updateFlag, comments]); // Removed fetchPostDetails from dependency array
 
   const checkIfFollowingAuthor = async (authorId) => {
     if (user) {
@@ -97,12 +116,13 @@ const PostDetails = () => {
     }
   };
 
-
-
   return (
     <>
       <div className={homestyles.homeBanner}>
         RedditSimilar
+        <span className={homestyles.authenticatedUser}>
+          {username ? <span>Hello, {username}</span> : null}
+        </span>
       </div>
       <ArrowBackIcon className={homestyles.createPostButton} onClick={() => navigate(`/`)} />
       <div className={homestyles.homeContainer}>
@@ -129,12 +149,12 @@ const PostDetails = () => {
                 <ArrowDownwardIcon onClick={() => handleVote(post.id, false, 'post')} />
               </div>
               {user && user.uid === post.userID && (
-              <div className={poststyles.buttonContainer}>
-                <EditPost post={{ id: postId, ...post }} fetchPosts={fetchPosts} />
-                <DeletePost postId={postId} />
-                <CreateComment postId={postId} />
-              </div>
-            )}          
+                <div className={poststyles.buttonContainer}>
+                  <EditPost post={{ id: postId, ...post }} fetchPosts={fetchPosts} />
+                  <DeletePost postId={postId} />
+                </div>
+              )} 
+              <CreateComment postId={postId} />         
             </div>
             {comments.map(comment => (
               <div key={comment.id} className={poststyles.commentContainer}>
@@ -147,10 +167,10 @@ const PostDetails = () => {
                 </div>
                 {user && user.uid === comment.userID && (
                   <div className={poststyles.buttonContainer}>
-                  <EditComment comment={comment} />
-                  <DeleteComment commentId={comment.id} />
-                  <CreateReply commentId={comment.id} />
-                </div>
+                    <EditComment comment={comment} />
+                    <DeleteComment commentId={comment.id} />
+                    <CreateReply commentId={comment.id} />
+                  </div>
                 )}
                 {replies.filter(reply => reply.commentId === comment.id).map(reply => (
                   <div key={reply.id} className={poststyles.replyContainer}>
