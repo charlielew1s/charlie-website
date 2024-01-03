@@ -21,8 +21,16 @@
 }
 
 .buttonContainer {
+  display: flex;
+  justify-content: flex-start; /* Align items to the start */
+  align-items: center;
   margin-top: 10px;
 }
+
+.buttonContainer > *:not(:last-child) {
+  margin-right: 5px; /* Adjust the right margin as needed */
+}
+
 
 .commentsLabel {
   font-weight: bold;
@@ -33,3 +41,8 @@
 }
 
 /* Additional styles for buttons, icons, and other elements as needed */
+.userAndFollow {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adding a gap of 10px between elements */
+}

@@ -6,8 +6,8 @@ body, html {
 
 
 .homeBanner {
-    background-color: #ea2121; /* Example: Different color, blue */
-    color: white;
+    background-color: white; /* Example: Different color, blue */
+    color: orange;
     text-align: center;
     padding: 14px 20px;
     font-weight: bold;
@@ -37,3 +37,13 @@ body, html {
     left: 5px;
     top: 10px;
 }
+
+.authenticatedUser {
+    position: absolute;
+    right: 70px; /* Increase the value to move the text further left */
+    top: 21px;
+    color: #000000; /* Or any other color that suits your design */
+    /* Add any other styling properties you need */
+  }
+  
+  
